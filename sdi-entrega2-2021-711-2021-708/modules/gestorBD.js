@@ -55,6 +55,25 @@ module.exports = {
             }
         });
     },
+    borrarUsuario: function(criterio,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'),function (err,db){
+            if(err){
+                funcionCallback(null);
+            }else{
+                let collection=db.collection('usuarios');
+                collection.deleteOne(criterio,function (err,deleted){
+                    if(err){
+                        funcionCallback(null);
+                    }
+                    else{
+                        funcionCallback(deleted);
+                    }
+
+                    db.close();
+                });
+            }
+        });
+    },
     obtenerCancionesPg : function(criterio,pg,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {

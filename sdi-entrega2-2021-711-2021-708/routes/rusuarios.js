@@ -13,6 +13,8 @@ module.exports = function(app, swig, gestorBD) {
             .update(req.body.password).digest('hex');
         let usuario = {
             email : req.body.email,
+            nombre: req.body.nombre,
+            apellidos: req.body.apellidos,
             password : seguro
         }
         gestorBD.insertarUsuario(usuario, function(id) {
@@ -47,7 +49,7 @@ module.exports = function(app, swig, gestorBD) {
                     "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0].email;
-                res.send("Identificado");
+                res.redirect("/publicaciones");
             }
         });
     });

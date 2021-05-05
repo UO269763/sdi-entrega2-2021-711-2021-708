@@ -155,7 +155,7 @@ app.use(express.static('public'));
 
 //Variables
 app.set('port', 8081);
-app.set('db', 'mongodb://admin:sdi@tiendamusica-shard-00-00.wxhqv.mongodb.net:27017,tiendamusica-shard-00-01.wxhqv.mongodb.net:27017,tiendamusica-shard-00-02.wxhqv.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-9otbjb-shard-0&authSource=admin&retryWrites=true&w=majority');
+app.set('db', 'mongodb://admin:sdi@mywallapop-shard-00-00.p7wgg.mongodb.net:27017,mywallapop-shard-00-01.p7wgg.mongodb.net:27017,mywallapop-shard-00-02.p7wgg.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-bzzkck-shard-0&authSource=admin&retryWrites=true&w=majority');
 
 app.set('clave','abcdefg');
 app.set('crypto',crypto);

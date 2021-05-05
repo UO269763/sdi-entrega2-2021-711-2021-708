@@ -49,7 +49,11 @@ module.exports = function(app, swig, gestorBD) {
                     "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0].email;
-                res.redirect("/publicaciones");
+                if (req.session.usuario == "admin@email.es"){
+                    res.redirect("/usuarios/list");
+                } else {
+                    res.redirect("/publicaciones");
+                }
             }
         });
     });
@@ -57,6 +61,24 @@ module.exports = function(app, swig, gestorBD) {
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         res.send("Usuario desconectado");
+    });
+
+    //metodo del admin que permite listar usuarios
+    app.get('/usuarios/list', function(req, res) {
+        gestorBD.obtenerTodosUsuarios(function (usuarios) {
+            let respuesta = swig.renderFile('views/blistadousuariosadmin.html', {
+                usuarios: usuarios
+            });
+            res.send(respuesta);
+        })
     })
 
+    app.get('/usuario/borrar/:id', function(req, res) {
+        let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.borrarUsuario(criterio, function (deleted){
+            if (deleted==null)
+                res.send("error al borrar");
+
+        })
+    })
 }

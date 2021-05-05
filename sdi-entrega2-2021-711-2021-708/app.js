@@ -106,8 +106,8 @@ routerUsuarioAutor.use(function(req, res, next) {
     let id = path.basename(req.originalUrl);
 // Cuidado porque req.params no funciona
 // en el router si los params van en la URL.
-    gestorBD.obtenerCanciones(
-        {_id: mongo.ObjectID(id) }, function (canciones) {
+    gestorBD.obtenerOfertas(
+        {_id: mongo.ObjectID(id) }, function (ofertas) {
             console.log(canciones[0]);
             if(canciones[0].autor == req.session.usuario ){
                 next();
@@ -168,9 +168,12 @@ require("./routes/rapicanciones.js")(app, gestorBD);
 require("./routes/rautores.js")(app, swig);
 require("./routes/rcomentarios.js")(app,swig,gestorBD);
 
+require("./routes/rpublicaciones.js")(app, swig);
+
 app.get('/', function (req, res) {
     res.redirect('/tienda');
 })
+
 
 app.use( function (err, req, res, next){
     console.log("Error producido: " +err); //mostramos el error por consola

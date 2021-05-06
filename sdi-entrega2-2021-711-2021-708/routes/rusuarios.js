@@ -78,7 +78,18 @@ module.exports = function(app, swig, gestorBD) {
         gestorBD.borrarUsuario(criterio, function (deleted){
             if (deleted==null)
                 res.send("error al borrar");
-
+            else //borramos el usuario, volvemos a cargar la tabla
+                gestorBD.obtenerTodosUsuarios(function (usuarios){
+                    if (usuarios == null){
+                        res.status(500);
+                        res.json({
+                            error: "se ha producido un error al cargar la tabla"
+                        })
+                    } else {
+                        res.status(200);
+                        res.send(JSON.stringify(usuarios));
+                    }
+                })
         })
     })
 }

@@ -74,19 +74,19 @@ module.exports = {
             }
         });
     },
-    obtenerCancionesPg : function(criterio,pg,funcionCallback){
+    obtenerOfertasPg : function(criterio,pg,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
-                let collection = db.collection('canciones');
+                let collection = db.collection('ofertas');
                 collection.count(function(err, count){
                     collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
-                        .toArray(function(err, canciones) {
+                        .toArray(function(err, ofertas) {
                             if (err) {
                                 funcionCallback(null);
                             } else {
-                                funcionCallback(canciones, count);
+                                funcionCallback(ofertas, count);
                             }
                             db.close();
                         });
@@ -128,12 +128,12 @@ module.exports = {
             }
         });
     },
-    eliminarCancion : function(criterio, funcionCallback) {
+    eliminarOferta : function(criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
-                let collection = db.collection('canciones');
+                let collection = db.collection('ofertas');
                 collection.remove(criterio, function(err, result) {
                     if (err) {
                         funcionCallback(null);
@@ -196,53 +196,55 @@ module.exports = {
             }
         });
     },
-    modificarCancion : function(criterio, cancion, funcionCallback) {
+    obtenerOfertas : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
-                let collection = db.collection('canciones');
-                collection.update(criterio, {$set: cancion}, function(err, result) {
+                let collection = db.collection('ofertas');
+                collection.find(criterio).toArray(function(err, ofertas) {
                     if (err) {
                         funcionCallback(null);
                     } else {
-                        funcionCallback(result);
+                        funcionCallback(ofertas);
                     }
                     db.close();
                 });
             }
         });
     },
-    obtenerCanciones : function(criterio,funcionCallback){
+    insertarOferta : function(oferta, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
-                let collection = db.collection('canciones');
-                collection.find(criterio).toArray(function(err, canciones) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(canciones);
-                    }
-                    db.close();
-                });
-            }
-        });
-    },
-    insertarCancion : function(cancion, funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('canciones');
-                collection.insertOne(cancion, function(err, result) {
+                let collection = db.collection('ofertas');
+                collection.insertOne(oferta, function(err, result) {
                     if (err) {
                         funcionCallback(null);
                     } else {
                         funcionCallback(result.ops[0]._id);
                     }
                     db.close();
+                });
+            }
+        });
+    }, obtenerListadoOfertasPg: function (criterio, pg, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('ofertas');
+                collection.count(function (err, count) {
+                    collection.find(criterio).skip((pg - 1) * 5).limit(5)
+                        .toArray(function (err, ofertas) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(ofertas, count);
+                            }
+                            db.close();
+                        });
                 });
             }
         });

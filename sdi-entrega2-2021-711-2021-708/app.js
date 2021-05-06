@@ -43,6 +43,7 @@ gestorBD.init(app, mongo);
 
 // routerUsuarioToken
 let routerUsuarioToken = express.Router();
+
 routerUsuarioToken.use(function(req, res, next) {
     // obtener el token, vía headers (opcionalmente GET y/o POST).
     let token = req.headers['token'] || req.body.token || req.query.token;
@@ -76,80 +77,41 @@ routerUsuarioToken.use(function(req, res, next) {
 
 
 // Aplicar routerUsuarioToken
-app.use('/api/cancion', routerUsuarioToken);
+app.use('/api/oferta', routerUsuarioToken);
 
 
 // routerUsuarioSession
 var routerUsuarioSession = express.Router();
+
 routerUsuarioSession.use(function(req, res, next) {
     console.log("routerUsuarioSession");
     if ( req.session.usuario ) {
         // dejamos correr la petición
         next();
     } else {
-        console.log("va a : "+req.session.destino)
         res.redirect("/identificarse");
     }
 });
 
 //Aplicar routerUsuarioSession
-app.use("/canciones/agregar",routerUsuarioSession);
-app.use("/publicaciones",routerUsuarioSession);
-app.use("/cancion/comprar",routerUsuarioSession);
-app.use("/compras",routerUsuarioSession);
+app.use("/oferta/*",routerUsuarioSession);
+app.use("/usuario/*",routerUsuarioSession);
 
-//routerUsuarioAutor
-let routerUsuarioAutor = express.Router();
-routerUsuarioAutor.use(function(req, res, next) {
+//routerUsuarioAdmin
+let routerUsuarioAdmin = express.Router();
+
+routerUsuarioAdmin.use(function(req, res, next) {
     console.log("routerUsuarioAutor");
-    let path = require('path');
-    let id = path.basename(req.originalUrl);
-// Cuidado porque req.params no funciona
-// en el router si los params van en la URL.
-    gestorBD.obtenerOfertas(
-        {_id: mongo.ObjectID(id) }, function (ofertas) {
-            console.log(canciones[0]);
-            if(canciones[0].autor == req.session.usuario ){
-                next();
-            } else {
-                res.redirect("/tienda");
-            }
-        })
+    if (req.session.usuario !== undefined && req.session.usuario.rol === 'admin') {
+        // dejamos correr la petición
+        next();
+    } else {
+        res.redirect("/home");
+    }
 });
-//Aplicar routerUsuarioAutor
-app.use("/cancion/modificar",routerUsuarioAutor);
-app.use("/cancion/eliminar",routerUsuarioAutor);
+//Aplicar routerUsuarioAdmin
+app.use("/usuario/*" ,routerUsuarioAdmin);
 
-
-//routerAudios
-let routerAudios = express.Router();
-routerAudios.use(function(req, res, next) {
-    console.log("routerAudios");
-    let path = require('path');
-    let idCancion = path.basename(req.originalUrl, '.mp3');
-    gestorBD.obtenerCanciones(
-        {"_id": mongo.ObjectID(idCancion) }, function (canciones) {
-            if(req.session.usuario && canciones[0].autor == req.session.usuario ){
-                next();
-            } else {
-                //res.redirect("/tienda");
-                let criterio = {
-                    usuario : req.session.usuario,
-                    cancionId : mongo.ObjectID(idCancion)
-                };
-
-                gestorBD.obtenerCompras(criterio ,function(compras){
-                    if (compras != null && compras.length > 0 ){
-                        next();
-                    } else {
-                        res.redirect("/tienda");
-                    }
-                });
-            }
-        })
-});
-//Aplicar routerAudios
-app.use("/audios/",routerAudios);
 
 app.use(express.static('public'));
 
@@ -162,16 +124,13 @@ app.set('crypto',crypto);
 
 //Rutas/controladores por lógica
 require("./routes/rusuarios.js")(app, swig, gestorBD);
-require("./routes/rcanciones.js")(app, swig, gestorBD);
-require("./routes/rapicanciones.js")(app, gestorBD);
-
-require("./routes/rautores.js")(app, swig);
-require("./routes/rcomentarios.js")(app,swig,gestorBD);
+require("./routes/rofertas.js")(app, swig, gestorBD);
+require("./routes/rapiofertas.js")(app, gestorBD);
 
 require("./routes/rpublicaciones.js")(app, swig);
 
 app.get('/', function (req, res) {
-    res.redirect('/tienda');
+    res.redirect('/index');
 })
 
 

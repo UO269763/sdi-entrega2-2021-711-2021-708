@@ -3,9 +3,11 @@
 {% block contenido_principal %}
 <h2>Usuarios</h2>
 
+<button class="btn" type="button" id="btEliminar" >Eliminar</button>
+
 <!-- Agregar Canción -->
 <div class="table-responsive">
-    <button type="button" id="btEliminar" >Eliminar</button>
+
 
     <table class="table table-hover">
         <thead>
@@ -19,12 +21,14 @@
         </thead>
         <tbody id="cuerpo">
         {% for usuario in usuarios %}
+        {% if usuario.email != 'admin@email.es' %}
         <tr>
             <td><input class = "checkbox" type="checkbox" name="checkbox" id={{ usuario._id.toString() }}></td>
             <td>{{ usuario.email }}</td>
             <td>{{ usuario.nombre }}</td>
             <td>{{ usuario.apellidos }}</td>
         </tr>
+        {% endif%}
         {% endfor %}
         </tbody>
     </table>
@@ -32,7 +36,6 @@
 
 <script>
     $('#btEliminar').on('click', function() {
-        console.log("vamos a borrar");
         let e = document.getElementsByName('checkbox');
         let usuariossinborrar;
         for (i = 0; i < e.length; i++){

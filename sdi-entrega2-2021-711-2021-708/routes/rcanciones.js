@@ -124,18 +124,26 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/publicaciones", function(req, res) {
-        let criterio = { autor : req.session.usuario };
-        gestorBD.obtenerOfertas(criterio, function(ofertas) {
-            if (ofertas == null) {
-                res.send("Error al listar ");
-            } else {
-                let respuesta = swig.renderFile('views/bpublicaciones.html',
-                    {
-                        ofertas : ofertas
-                    });
-                res.send(respuesta);
-            }
-        });
+        let usuarioSesion = req.session.usuario;
+        console.log(usuarioSesion);
+        if (usuarioSesion == null) {
+            res.redirect("/identificarse");
+            return;
+        } else {
+            let criterio = {autor: req.session.usuario};
+            gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                if (ofertas == null) {
+                    res.send("Error al listar ");
+                } else {
+                    let respuesta = swig.renderFile('views/bpublicaciones.html',
+                        {
+                            ofertas: ofertas,
+                            usuarioSesion: usuarioSesion
+                        });
+                    res.send(respuesta);
+                }
+            });
+        }
     });
 
 

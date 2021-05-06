@@ -4,7 +4,7 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/registrarse", function(req, res) {
-        let respuesta = swig.renderFile('views/bregistro.html', {});
+        let respuesta = swig.renderFile('views/bregistro.html', { usuarioSesion: req.session.usuario });
         res.send(respuesta);
     });
 
@@ -29,11 +29,13 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/identificarse", function(req, res) {
-        let respuesta = swig.renderFile('views/bidentificacion.html', {});
+
+        let respuesta = swig.renderFile('views/bidentificacion.html', { usuarioSesion: req.session.usuario });
         res.send(respuesta);
     });
 
     app.post("/identificarse", function(req, res) {
+
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
         let criterio = {
@@ -60,11 +62,13 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
-        res.send("Usuario desconectado");
+        let respuesta = swig.renderFile('views/bidentificacion.html', { usuarioSesion: null });
+        res.send(respuesta);
     });
 
     //metodo del admin que permite listar usuarios
     app.get('/usuarios/list', function(req, res) {
+        let usuarioSesion = req.session.usuario;
         gestorBD.obtenerTodosUsuarios(function (usuarios) {
             let respuesta = swig.renderFile('views/blistadousuariosadmin.html', {
                 usuarios: usuarios

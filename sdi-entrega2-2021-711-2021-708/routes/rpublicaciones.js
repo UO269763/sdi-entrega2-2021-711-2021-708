@@ -27,7 +27,7 @@ module.exports = function (app, swig, gestorBD) {
                         paginas.push(i);
                     }
                 }
-                let respuesta = swig.renderFile('views/btienda.html',
+                let respuesta = swig.renderFile('views/bindex.html',
                     {
                         canciones: canciones,
                         paginas: paginas,
@@ -52,7 +52,7 @@ module.exports = function (app, swig, gestorBD) {
             "precio": "1.1"
         }]
 
-        let respuesta = swig.renderFile("views/btienda.html",
+        let respuesta = swig.renderFile("views/bindex.html",
             {vendedor: "Tienda de canciones", canciones: canciones});
 
         res.send(respuesta);

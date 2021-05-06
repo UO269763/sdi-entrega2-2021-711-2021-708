@@ -30,8 +30,13 @@
                 <li id="mCompras"><a href="/compras">Compras</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
-                <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+                {% if usuarioSesion == null %}
+                <li><a href="/registrarse" id="registarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
+                <li><a href="/identificarse" id="identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+                {% else %}
+                <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-out"></span> Cerrar sesión</a>
+                {% endif%}
+                </li>
             </ul>
         </div>
     </div>

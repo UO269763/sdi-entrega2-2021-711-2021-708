@@ -93,7 +93,7 @@ module.exports = function (app, swig, gestorBD) {
                 if (req.session.usuario == "admin@email.es") {
                     res.redirect("/usuario/list");
                 } else {
-                    res.redirect("/misofertas");
+                    res.redirect("/oferta/misofertas");
 
                 }
             }

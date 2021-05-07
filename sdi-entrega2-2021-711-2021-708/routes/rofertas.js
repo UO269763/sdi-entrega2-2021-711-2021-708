@@ -6,10 +6,6 @@ module.exports = function (app, swig, gestorBD) {
     del sistema) y cantidad solicitada en euros.
      */
     app.get('/oferta/agregar', function (req, res) {
-        if (req.session.usuario == null) {
-            res.redirect("/identificarse");
-            return;
-        }
         let respuesta = swig.renderFile('views/bagregar.html', {
             usuarioSesion: req.session.usuario
         });
@@ -18,7 +14,22 @@ module.exports = function (app, swig, gestorBD) {
 
     app.post("/oferta/agregar", function (req, res) {
         if (req.session.usuario == null) {
-            res.redirect("/index");
+            res.redirect("/identificarse");
+            return;
+        } else if (req.body.nombre < 2) {
+            res.redirect("/oferta/agregar?mensaje=El nombre de la oferta debe tener mas de 2 caracteres");
+            return;
+        }
+        if (req.body.info === "" || req.body.info === null) {
+            res.redirect("/oferta/agregar?mensaje=La información no puede ser vacía");
+            return;
+        }
+        if (req.body.precio === "" || req.body.precio === null) {
+            res.redirect("/oferta/agregar?mensaje=El precio no puede ser vacío");
+            return;
+        }
+        if (req.body.precio === "" || req.body.precio <= 0) {
+            res.redirect("/oferta/agregar?mensaje=Compruebe el precio de su producto");
             return;
         }
         let now = new Date();
@@ -36,7 +47,7 @@ module.exports = function (app, swig, gestorBD) {
             if (id == null) {
                 res.send("Error al insertar oferta");
             } else {
-                res.redirect("/misofertas");
+                res.redirect("/oferta/misofertas");
             }
         });
 
@@ -47,7 +58,7 @@ module.exports = function (app, swig, gestorBD) {
     todas sus ofertas. Para cada oferta se mostrará: texto descriptivo de la oferta, detalle de la oferta y
     cantidad solicitada en euros.
      */
-    app.get("/misofertas", function (req, res) {
+    app.get("/oferta/misofertas", function (req, res) {
         let usuarioSesion = req.session.usuario;
         if (usuarioSesion == null) {
             res.redirect("/identificarse");
@@ -58,7 +69,7 @@ module.exports = function (app, swig, gestorBD) {
                 if (ofertas == null) {
                     res.send("Error al listar");
                 } else {
-                    let respuesta = swig.renderFile('views/bpublicaciones.html',
+                    let respuesta = swig.renderFile('views/bmisofertas.html',
                         {
                             ofertas: ofertas,
                             usuarioSesion: usuarioSesion
@@ -80,7 +91,7 @@ module.exports = function (app, swig, gestorBD) {
             if (ofertas == null) {
                 res.send(respuesta);
             } else {
-                res.redirect("/misofertas");
+                res.redirect("/oferta/misofertas");
             }
         });
     });

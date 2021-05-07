@@ -285,5 +285,128 @@ module.exports = {
                 });
             }
         });
-    }
+    },
+    obtenerMensajes: function (crit, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('mensajes');
+                console.log(crit)
+                collection.find(crit).toArray(function (err, mensajes) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(mensajes);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    eliminarMensajes: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('mensajes');
+                collection.remove(criterio, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    eliminarConversaciones: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('conversaciones');
+                collection.remove(criterio, function (err, conversaciones) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(conversaciones);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    obtenerConversaciones:function(criterio,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('conversaciones');
+                collection.find(criterio).toArray(function (err, conversaciones) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(conversaciones);
+                    }
+                    db.close();
+                });
+
+            }
+        });
+
+    },
+    crearNuevaConversacion: function (mensaje, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('conversaciones');
+                collection.insertOne(mensaje, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    marcarLeido: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('mensajes');
+                collection.update(criterio, {$set: {read: true}}, function (err, resultado) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(resultado);
+                    }
+                });
+            }
+            db.close();
+        });
+    },
+    insertarMensaje: function (message, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('mensajes');
+                collection.insert(message, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
 }

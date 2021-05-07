@@ -1,0 +1,108 @@
+<div class="recentChatsWrapper">
+
+    <h3>Conversaciones</h3>
+
+    <div id="widget-conversaciones" class="recentChats">
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Oferta</th>
+                <th class="col-md-1"></th>
+                <th class="col-md-1"></th>
+            </tr>
+            </thead>
+            <tbody id="tablaCuerpo">
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+    window.history.pushState("", "", "/cliente.html?w=conversaciones");
+
+    function cargarConversaciones() {
+        $.ajax({
+            url: URLbase + "/conversacion/list/" ,
+            type: "POST",
+            data: {},
+            dataType: 'json',
+            headers: {"token": Cookies.get('token')},
+            success: function (respuesta) {
+                let conversaciones = respuesta;
+                actualizarTabla(conversaciones);
+            },
+            error: function () {
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
+    }
+
+    function actualizarTabla(conversacionesMostrar) {
+        $("#tablaCuerpo").empty(); // Vaciar la tabla
+        for (let i = 0; i < conversacionesMostrar.length; i++) {
+            $("#tablaCuerpo").append(
+                "<tr id=" + conversacionesMostrar[i]._id + ">" +
+                "<td>" + conversacionesMostrar[i].user1 + "</td>" +
+                "<td>" + conversacionesMostrar[i].title + "</td>" +
+                "<td><a id='sendMessageConver' class='btn btn-primary' onclick=cargarChat('"
+                + conversacionesMostrar[i].offer.toString()
+                + "','"
+                + conversacionesMostrar[i].user1+ "','"
+                + conversacionesMostrar[i].user2+ "')>Enviar mensaje</a></td>" +
+                "<td><a id='deleteMessage'class='btn btn-primary' onclick=eliminarConversacion('"
+                + conversacionesMostrar[i]._id + "')>Eliminar conversación</a></td>" +
+                "</tr>"
+            );
+        }
+    }
+
+    function eliminarConversacion(id) {
+        $.ajax({
+            url: URLbase + "/conversacion/borrar/" + id ,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {
+                "token": Cookies.get('token')
+            },
+            success: function (respuesta) {
+                $("#contenedor-principal").load("widget-conversaciones.html");
+            },
+            error: function (error) {
+                alert('Error al borrar conversacion');
+                Cookies.remove('token');
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
+        $("#contenedor-principal").load("widget-conversaciones.html");
+    }
+
+    function cargarChat(id, email1, email2) {
+        idOferta = id;
+        var emaild;
+        demail = email1;
+        remail = email2;
+        Cookies.set('idOferta',idOferta);
+
+        if(semail===Cookies.get('emailO'))
+        {
+            emaild = email2;
+            Cookies.set('emailO',remail);
+        }else
+        {
+            emaild= email1;
+            Cookies.set('emailO',demail);
+        }
+
+        $("#contenedor-principal").load("widget-chat.html");
+        window.history.pushState("", "", "/cliente.html?w=chat&receptor=" + emaild + "&oferta=" + id);
+    }
+
+    cargarConversaciones();
+
+    ;
+</script>

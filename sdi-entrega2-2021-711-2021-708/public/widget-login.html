@@ -33,14 +33,12 @@
             },
             dataType: 'json',
             success: function (respuesta) {
-                console.log(respuesta.token);
                 Cookies.set('token', respuesta.token);
-                $("#contenedor-principal").load("widget-canciones.html");
+                $("#contenedor-principal").load("widget-ofertas.html");
 
             },
             error: function (error) {
                 Cookies.remove('token');
-
                 $("widget-login").prepend("<div class='alert alert-danger'>" +
                     "Usuario no encontrado </div>");
             }

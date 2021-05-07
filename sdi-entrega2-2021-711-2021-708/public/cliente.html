@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-  <title>jQuery uoMusic </title>
+  <title>MyWallapop</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
@@ -22,11 +22,20 @@
       <img src="/img/logo.png" alt="logo"/>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav" id="barra-menu">
-        <li><a onclick=widgetCanciones()>Canciones</a></li>
+      <ul class="nav navbar-nav">
+        <li id="offers-menu" class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" id="offersmanage" href="#">
+            Menu <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a onclick="verOfertas()" id="ofertasv">Ver Ofertas </a></li>
+            <li><a onclick="verConvers()" id="conver">Ver Conversaciones</a></li>
+
+          </ul>
+        </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right" id="barra-menu-derecha">
-        <!-- Opciones de menú aqui -->
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="login()"><span class="glyphicon glyphicon-log-in"></span> Desconectar</a></li>
       </ul>
     </div>
   </div>
@@ -39,15 +48,9 @@
 </div>
 
 <script>
-  function widgetCanciones(){
-    $( "#contenedor-principal" ).load( "widget-canciones.html");
-  }
-</script>
-<script>
-  let token;
-  let URLbase = "https://localhost:8081/api";
 
-  $( "#contenedor-principal" ).load( "widget-login.html");
+  let URLbase = "https://localhost:8081/api";
+  let token;
 
   if ( Cookies.get('token') != null ){
     token = Cookies.get('token');
@@ -56,10 +59,27 @@
     let w = url.searchParams.get("w");
     if ( w == "login"){
       $( "#contenedor-principal" ).load("widget-login.html");
+    } else if ( w == "conversaciones"){
+      $( "#contenedor-principal" ).load("widget-conversaciones.html");
+    } else if ( w == "oferta"){
+      $( "#contenedor-principal" ).load("widget-ofertas.html");
+    } else if ( w == "chat"){
+      $( "#contenedor-principal" ).load("widget-chat.html");
     }
-    if ( w == "canciones"){
-      $( "#contenedor-principal" ).load("widget-canciones.html");
-    }
+  } else {
+    $("#contenedor-principal").load("widget-login.html");
+  }
+
+  function verOfertas(){
+    $("#contenedor-principal").load("widget-ofertas.html");
+  }
+
+  function verConversaciones(){
+    $("#contenedor-principal").load("widget-conversaciones.html");
+  }
+
+  function login() {
+    $("#contenedor-principal").load("widget-login.html");
   }
 </script>
 

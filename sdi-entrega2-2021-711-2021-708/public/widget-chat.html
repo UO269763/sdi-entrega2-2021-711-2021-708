@@ -1,0 +1,171 @@
+<div class="bodyWrapper">
+    <div class="currentChat">
+        <div class="currentChatHeader">
+            <div class="currentChatImageWrapper">
+                <img src="img/logo.png" alt="" class="currentChatImage">
+            </div>
+            <div  class="currentChatHeaderTitle">
+                <h3 id="chatTitle" >Titulo</h3>
+            </div>
+        </div>
+        <div class="currentChatContent" id="currentChatContent">
+            <div class="message received">
+                <div class="messageContent">
+                    Cargando...
+                </div>
+                <div class="messageTime">12:32</div>
+                <div class="messageTime">✈</div>
+            </div>
+            <div class="message sent">
+                <div class="messageContent">
+                    ...Espere un momento
+                </div>
+                <div class="messageTime">12:50</div>
+                <div class="messageTime">✈</div>
+            </div>
+        </div>
+        <div class="currentChatInput">
+            <input type="text" name="" id="inputMessage">
+            <input type="button" value="↩︎" id="submitMessage" onclick="sendMessage()">
+        </div>
+    </div>
+</div>
+<script>
+    function cargarConversaciones() {
+        $("#chatTitle").empty()
+        $("#chatTitle").append(Cookies.get('emailO'));
+        $.ajax({
+            url: URLbase + "/buscar/oferta/conversacion/" + idOferta,
+            type: "POST",
+            data: {},
+            headers: {"token": token},
+
+            success: function (respuesta) {
+
+                conversacionid = respuesta;
+                mostrarMensaje(conversacionid._id);
+
+            },
+            error: function () {
+                $("#contenedor-principal").load("widget-conversaciones.html");
+
+            }
+        });
+    }
+
+    function mostrarMensaje(conversacionid ) {
+        let token = Cookies.get('token');
+        $.ajax({
+            url: URLbase + "/oferta/conversacion/" + conversacionid,
+            type: "GET",
+            data: {},
+            headers: {"token": token},
+            success: function (respuesta) {
+                conversaciones = respuesta;
+                mostrarMensajes(conversaciones);
+            },
+            error: function () {
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
+    }
+    
+    function mostrarMensajes( messages ) {
+
+        $("#currentChatContent").empty();
+        for (var i = 0; i < messages.length; i++) {
+
+            var message = "";
+            if (messages[i].receiver === Cookies.get('emailO')) {
+                message = "<div class='currentChatContent'>" +
+                    "<div class='message sent'>"  +
+                    "<div class='messageContent'>" + messages[i].message + "</div>" +
+                    "<div class='messageTime'>" + timeStamp(new Date(messages[i].date)) + "</div>";
+                if (messages[i].read) {
+                    message += "<div class='messageTime'>"+'✔✔' + "</div>";
+                }
+                else{
+                    message += "<div class='messageTime'>"+'✈' + "</div>";
+                }
+                message += "</div>";
+            }
+            else{
+                leerMensaje(messages[i]._id.toString());
+
+
+                message = "<div class='currentChatContent'>" +
+                    "<div class='message received'>"+
+                    "<div class='messageContent'>" + messages[i].message + "</div>" +
+                    "<div class='messageTime'>" +  timeStamp(new Date(messages[i].date))  + "</div>" ;
+
+                message += "</div>" ;
+
+            }
+            $("#currentChatContent").append(message);
+        }
+
+    }
+
+
+    function mandarMensaje() {
+        if ($("#inputMessage").val() != '') {
+            $.ajax({
+                url: URLbase + "/oferta/mensaje/" + idOferta,
+                type: "POST",
+                data: {
+                    receiver: Cookies.get('emailO'),
+                    message: $("#inputMessage").val(),
+                    token: token
+                },
+                dataType: 'json',
+                success: function (respuesta) {
+                    cargarConversaciones();
+                    $("#inputMessage").val('');
+                },
+                error: function (error) {
+                    $("#contenedor-principal").load("widget-conversaciones.html");
+                }
+            });
+        }
+    }
+
+    function leerMensaje(id) {
+        $.ajax({
+            url: URLbase + "/mensaje/leido/" + id,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {
+                "token": token
+            },
+            success: function (res) {},
+            error: function (error) {
+                $("#contenedor-principal").load("widget-conversaciones.html");
+            }
+        });
+    }
+
+    function timeStamp(now) {
+        // Create an array with the current month, day and time
+        var date = [now.getMonth() + 1, now.getDate(), now.getFullYear()];
+        // Create an array with the current hour, minute and second
+        var time = [now.getHours(), now.getMinutes(), now.getSeconds()];
+        // Determine AM or PM suffix based on the hour
+        var suffix = (time[0] < 12) ? "AM" : "PM";
+        // Convert hour from military time
+        time[0] = (time[0] < 12) ? time[0] : time[0] - 12;
+        // If hour is 0, set it to 12
+        time[0] = time[0] || 12;
+        // If seconds and minutes are less than 10, add a zero
+        for (var i = 1; i < 3; i++) {
+            if (time[i] < 10) {
+                time[i] = "0" + time[i];
+            }
+        }
+        // Return the formatted string
+        return date.join("/") + " " + time.join(":") + " " + suffix;
+    }
+
+    cargarConversaciones();
+
+</script>

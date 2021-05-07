@@ -101,12 +101,12 @@ app.use("/usuario/*",routerUsuarioSession);
 let routerUsuarioAdmin = express.Router();
 
 routerUsuarioAdmin.use(function(req, res, next) {
-    console.log("routerUsuarioAutor");
-    if (req.session.usuario !== undefined && req.session.usuario.rol === 'admin') {
+    console.log("routerUsuarioAdmin");
+    if (req.session.usuario !== undefined && req.session.usuario === 'admin@email.es') {
         // dejamos correr la petición
         next();
     } else {
-        res.redirect("/home");
+        res.redirect("/index");
     }
 });
 //Aplicar routerUsuarioAdmin
@@ -127,7 +127,6 @@ require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rofertas.js")(app, swig, gestorBD);
 require("./routes/rapiofertas.js")(app, gestorBD);
 
-require("./routes/rpublicaciones.js")(app, swig);
 
 app.get('/', function (req, res) {
     res.redirect('/index');

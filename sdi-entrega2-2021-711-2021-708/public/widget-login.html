@@ -1,46 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Widget-agregar</title>
+</head>
+<body>
 <div id="widget-login">
-    <div className="form-group">
-        <label className="control-label col-sm-2" htmlFor="email">Email:</label>
-        <div className="col-sm-10">
-            <input type="email" className="form-control" name="email"
-                   placeholder="email@email.com" id="email"/>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="email">Email:</label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control" name="email"
+                   placeholder="email@email.com" id="email" />
         </div>
     </div>
-    <div className="form-group">
-        <label className="control-label col-sm-2" htmlFor="password">Password:</label>
-        <div className="col-sm-10">
-            <input type="password" className="form-control" name="password"
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="password">Password:</label>
+        <div class="col-sm-10">
+            <input type="password" class="form-control" name="password"
                    placeholder="contraseña" id="password"/>
         </div>
     </div>
-    <div className="form-group">
-        <div className="col-sm-offset-2 col-sm-10">
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
             <button type="button" id="boton-login">Aceptar</button>
         </div>
     </div>
 </div>
+</body>
+</html>
 
 <script>
     window.history.pushState("", "", "/cliente.html?w=login");
-
     $("#boton-login").click(function () {
         $.ajax({
             url: URLbase + "/autenticar",
             type: "POST",
             data: {
-                email: $("#email").val(),
-                password: $("#password").val()
+                email : $("#email").val(),
+                password : $("#password").val()
             },
             dataType: 'json',
-            success: function (respuesta) {
+            success: function(respuesta){
+                console.log(respuesta.token);  // <- Prueba
+                token = respuesta.token;
                 Cookies.set('token', respuesta.token);
                 $("#contenedor-principal").load("widget-ofertas.html");
-
             },
-            error: function (error) {
+            error : function (eror) {
                 Cookies.remove('token');
-                $("widget-login").prepend("<div class='alert alert-danger'>" +
-                    "Usuario no encontrado </div>");
+                $("#widget-login").prepend("<div class='alert alert-danger'>Usuario no encontrado</div>");
             }
         });
     });

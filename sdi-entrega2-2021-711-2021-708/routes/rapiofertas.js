@@ -137,7 +137,7 @@ module.exports = function(app, gestorBD) {
 
     function enviarMensaje(text, sender, receiver, convId, offerId, req, res) {
 
-        let mensaje = {
+        let message = {
             sender: sender,
             receiver: receiver,
             oferta: offerId,
@@ -213,17 +213,17 @@ module.exports = function(app, gestorBD) {
                             error: "Oferta no encontrada"
                         })
                     } else {
-                        let owner = req.body.receiver;
+                        let autor = req.body.receiver;
                         let user = infoToken.usuario;
                         let criterio = {
                             $or: [
                                 {
                                     sender: user,
-                                    receiver: owner,
+                                    receiver: autor,
                                     oferta: gestorBD.mongo.ObjectID(req.body.id)
                                 },
                                 {
-                                    sender: owner,
+                                    sender: autor,
                                     receiver: user,
                                     oferta: gestorBD.mongo.ObjectID(req.body.id)
                                 }
@@ -268,7 +268,7 @@ module.exports = function(app, gestorBD) {
         })
     });
 
-    app.post("/api/offer/conversacion/list", function (req, res) {
+    app.post("/api/oferta/listaConver/", function (req, res) {
         let criterio = {$or: [{user1: res.usuario}, {user2: res.usuario}]};
         gestorBD.obtenerConversaciones(criterio, function (conver) {
             if (conver == null) {
@@ -348,13 +348,13 @@ module.exports = function(app, gestorBD) {
                         let criterio = {$or: [
                                 {
                                     user1: usuario,
-                                    user2: ofertas[0].owner,
-                                    oferta: gestorBD.mongo.ObjectID(req.params.id)
+                                    user2: ofertas[0].autor,
+                                    offer: gestorBD.mongo.ObjectID(req.params.id)
                                 },
                                 {
-                                    user1: ofertas[0].owner,
+                                    user1: ofertas[0].autor,
                                     user2: usuario,
-                                    oferta: gestorBD.mongo.ObjectID(req.params.id)
+                                    offer: gestorBD.mongo.ObjectID(req.params.id)
                                 }
                             ]};
 

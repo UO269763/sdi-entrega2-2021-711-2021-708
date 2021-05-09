@@ -1,7 +1,7 @@
 module.exports = function (app, swig, gestorBD) {
 
     app.get("/registrarse", function (req, res) {
-        let respuesta = swig.renderFile('views/bregistro.html', {usuarioSesion: req.session.usuario});
+        let respuesta = swig.renderFile('views/bregistro.html', { usuarioSesion: req.session.usuario});
         res.send(respuesta);
     });
 
@@ -62,8 +62,7 @@ module.exports = function (app, swig, gestorBD) {
     });
 
     app.get("/identificarse", function (req, res) {
-
-        let respuesta = swig.renderFile('views/bidentificacion.html', {usuarioSesion: req.session.usuario});
+        let respuesta = swig.renderFile('views/bidentificacion.html', { usuarioSesion: req.session.usuario });
         res.send(respuesta);
     });
 
@@ -89,8 +88,8 @@ module.exports = function (app, swig, gestorBD) {
                     "?mensaje=Email o password incorrecto" +
                     "&tipoMensaje=alert-danger ");
             } else {
-                req.session.usuario = usuarios[0].email;
-                if (req.session.usuario == "admin@email.es") {
+                req.session.usuario = usuarios[0];
+                if (req.session.usuario.email == "admin@email.es") {
                     res.redirect("/usuario/list");
                 } else {
                     res.redirect("/oferta/misofertas");
@@ -108,12 +107,12 @@ module.exports = function (app, swig, gestorBD) {
 
     //metodo del admin que permite listar usuarios
     app.get('/usuario/list', function (req, res) {
-        let usuarioRegistrado = req.session.usuario;
-        if ( usuarioRegistrado == null || usuarioRegistrado.rol === 'user'){
+        let usuarioSesion = req.session.usuario;
+        let criterio = { rol: 'user' }
+        if ( usuarioSesion === null || usuarioSesion.rol === 'user'){
             res.redirect("/identificarse?mensaje=Solo el administrador tiene acceso a esta zona")
         } else {
-            let usuarioSesion = req.session.usuario;
-            gestorBD.obtenerTodosUsuarios(function (usuarios) {
+            gestorBD.obtenerUsuarios(criterio,function (usuarios) {
                 let respuesta = swig.renderFile('views/blistadousuariosadmin.html', {
                     usuarios: usuarios,
                     usuarioSesion: usuarioSesion

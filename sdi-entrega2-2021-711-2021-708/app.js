@@ -85,6 +85,7 @@ var routerUsuarioSession = express.Router();
 
 routerUsuarioSession.use(function(req, res, next) {
     console.log("routerUsuarioSession");
+    let criterio;
     if ( req.session.usuario ) {
         // dejamos correr la petición
         next();
@@ -102,7 +103,7 @@ let routerUsuarioAdmin = express.Router();
 
 routerUsuarioAdmin.use(function(req, res, next) {
     console.log("routerUsuarioAdmin");
-    if (req.session.usuario !== undefined && req.session.usuario === 'admin@email.es') {
+    if (req.session.usuario !== undefined && req.session.usuario.email === 'admin@email.es') {
         // dejamos correr la petición
         next();
     } else {

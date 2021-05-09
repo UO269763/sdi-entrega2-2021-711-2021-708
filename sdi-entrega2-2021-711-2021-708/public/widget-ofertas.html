@@ -37,29 +37,33 @@
         });
     }
 
-    function actualizarTabla(ofertasMostrar) {
+    function actualizarTabla(ofertas) {
         $("#tablaCuerpo").empty(); // Vaciar la tabla
 
-        for (let i = 0; i < ofertasMostrar.length; i++) {
+        for (let i = 0; i < ofertas.length; i++) {
             $("#tablaCuerpo").append(
-                "<tr id=" + ofertasMostrar[i]._id + ">" +
-                "<td>" + ofertasMostrar[i].nombre + "</td>" +
-                "<td>" + ofertasMostrar[i].info + "</td>" +
-                "<td>" + ofertasMostrar[i].precio + "</td>" +
-                "<td><a id='sendMessage' class='btn btn-primary' onclick=cargarConversacion('" + ofertasMostrar[i]._id + "','" + ofertasMostrar[i].owner + "')>Enviar mensaje</a></td>" +
+                "<tr id=" + ofertas[i]._id + ">" +
+                "<td>" + ofertas[i].nombre + "</td>" +
+                "<td>" + ofertas[i].info + "</td>" +
+                "<td>" + ofertas[i].precio + "</td>" +
+                "<td><a id='sendMessage' class='btn btn-primary' onclick=cargarConversacion('" + ofertas[i]._id + "','" + ofertas[i].autor + "')>Enviar mensaje</a></td>" +
                 "</tr>"
+
             );
+            console.log(ofertas[i].autor);
         }
+
     }
 
     function cargarConversacion(id, email) {
         idOferta = id;
-        emailO = email;
+        semail = email;
         Cookies.set('idOferta',idOferta);
-        Cookies.set('emailO',emailO);
+        Cookies.set('semail',semail);
         $("#contenedor-principal").load("widget-chat.html");
         window.history.pushState("", "", "/cliente.html?w=chat&receptor=" + email + "&oferta=" + id);
     }
 
     cargarOfertas();
+
 </script>

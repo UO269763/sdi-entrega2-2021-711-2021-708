@@ -26,7 +26,7 @@
 
     function cargarConversaciones() {
         $.ajax({
-            url: URLbase + "/conversacion/list/" ,
+            url: URLbase + "/oferta/listaConver/" ,
             type: "POST",
             data: {},
             dataType: 'json',
@@ -36,6 +36,7 @@
                 actualizarTabla(conversaciones);
             },
             error: function () {
+                console.log("no estoy funcionando");
                 $("#contenedor-principal").load("widget-login.html");
             }
         });
@@ -47,7 +48,7 @@
             $("#tablaCuerpo").append(
                 "<tr id=" + conversacionesMostrar[i]._id + ">" +
                 "<td>" + conversacionesMostrar[i].user1 + "</td>" +
-                "<td>" + conversacionesMostrar[i].title + "</td>" +
+                "<td>" + (conversacionesMostrar[i].title + "hola") + "</td>" +
                 "<td><a id='sendMessageConver' class='btn btn-primary' onclick=cargarChat('"
                 + conversacionesMostrar[i].offer.toString()
                 + "','"
@@ -88,14 +89,14 @@
         remail = email2;
         Cookies.set('idOferta',idOferta);
 
-        if(semail===Cookies.get('emailO'))
+        if(semail===Cookies.get('lemail'))
         {
             emaild = email2;
-            Cookies.set('emailO',remail);
+            Cookies.set('semail',remail);
         }else
         {
             emaild= email1;
-            Cookies.set('emailO',demail);
+            Cookies.set('semail',demail);
         }
 
         $("#contenedor-principal").load("widget-chat.html");
@@ -104,5 +105,4 @@
 
     cargarConversaciones();
 
-    ;
 </script>

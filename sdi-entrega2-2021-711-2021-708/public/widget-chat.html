@@ -26,14 +26,15 @@
         </div>
         <div class="currentChatInput">
             <input type="text" name="" id="inputMessage">
-            <input type="button" value="↩︎" id="submitMessage" onclick="sendMessage()">
+            <input type="button" value="↩︎" id="submitMessage" onclick="mandarMensaje()">
         </div>
     </div>
 </div>
 <script>
+
     function cargarConversaciones() {
         $("#chatTitle").empty()
-        $("#chatTitle").append(Cookies.get('emailO'));
+        $("#chatTitle").append(Cookies.get('semail'));
         $.ajax({
             url: URLbase + "/buscar/oferta/conversacion/" + idOferta,
             type: "POST",
@@ -76,7 +77,7 @@
         for (var i = 0; i < messages.length; i++) {
 
             var message = "";
-            if (messages[i].receiver === Cookies.get('emailO')) {
+            if (messages[i].receiver === Cookies.get('semail')) {
                 message = "<div class='currentChatContent'>" +
                     "<div class='message sent'>"  +
                     "<div class='messageContent'>" + messages[i].message + "</div>" +

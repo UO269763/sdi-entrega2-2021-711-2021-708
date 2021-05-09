@@ -25,20 +25,25 @@
         </div>
 
         <div class="collapse navbar-collapse" id="myNavbar">
-            {% if usuarioSesion !== null %}
+            {% if usuarioSesion === null %}
+            {% elif usuarioSesion.rol !== "admin" %}
             <ul class="nav navbar-nav">
                 <li id="buscarofertas"><a href="/oferta/buscar">Buscar ofertas</a></li>
                 <li id="addoferta"><a href="/oferta/agregar">Agregar ofertas</a></li>
                 <li id="misofertas"><a href="/oferta/misofertas">Mis ofertas</a></li>
                 <li id="ofertascompradas"><a href="/oferta/miscompras">Ofertas compradas</a></li>
-            </ul>s
+            </ul>
+            {% elif usuarioSesion.rol === "admin" %}
+            <ul class="nav navbar-nav">
+                <li id="listarusuarios"><a href="/usuario/list">Listar usuarios</a></li>
+            </ul>
             {% endif%}
             <ul class="nav navbar-nav navbar-right">
                 {% if usuarioSesion === null %}
                 <li><a href="/registrarse" id="registarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
                 <li><a href="/identificarse" id="identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
                 {% else %}
-                <li><a><span class="glyphicon glyphicon-euro"> </span></a></li>
+                <li><a><span class="glyphicon glyphicon-euro"> </span>{{ usuarioSesion.money }}</a></li>
                 <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-out"></span> Cerrar sesión</a>
                 {% endif%}
                 </li>

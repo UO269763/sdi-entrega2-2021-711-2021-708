@@ -41,9 +41,9 @@
             <td>{{ oferta.nombre }}</td>
             <td>{{ oferta.info }} </td>
             <td>{{ oferta.precio }} </td>
-            {% if oferta.estado === 'disponible' && oferta.autor !== usuarioSesion %}
+            {% if oferta.estado === 'disponible' && oferta.autor !== usuarioSesion.email %}
             <td><a class="compra" name="compraoferta" href="{{'/oferta/comprar/'+oferta._id.toString()}}">Comprar</a></td>
-            {% elif oferta.autor === usuarioSesion %}
+            {% elif oferta.autor === usuarioSesion.email %}
             <td>Propietario</td>
             {% else %}
             <td>Vendida</td>

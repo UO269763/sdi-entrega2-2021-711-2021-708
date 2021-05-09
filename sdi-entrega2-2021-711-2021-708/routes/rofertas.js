@@ -38,7 +38,7 @@ module.exports = function (app, swig, gestorBD) {
             info: req.body.info,
             precio: req.body.precio,
             fecha: now.toDateString(),
-            autor: req.session.usuario,
+            autor: req.session.usuario.email,
             estado: 'disponible',
             comprador: undefined
         }
@@ -60,11 +60,12 @@ module.exports = function (app, swig, gestorBD) {
      */
     app.get("/oferta/misofertas", function (req, res) {
         let usuarioSesion = req.session.usuario;
+        console.log(usuarioSesion.money);
         if (usuarioSesion == null) {
             res.redirect("/identificarse");
             return;
         } else {
-            let criterio = { autor: req.session.usuario};
+            let criterio = { autor: req.session.usuario.email };
             gestorBD.obtenerOfertas(criterio, function (ofertas) {
                 if (ofertas == null) {
                     res.send("Error al listar");
@@ -174,7 +175,7 @@ module.exports = function (app, swig, gestorBD) {
                         email: req.session.usuario.email,
                         password: req.session.usuario.password,
                         rol: 'user',
-                        dinero: saldo
+                        money: saldo
                     }
                     gestorBD.modificarUsuario(cri, usuario, function (result) {
                         if (result == null) {
@@ -188,7 +189,7 @@ module.exports = function (app, swig, gestorBD) {
                                 fecha: ofertas[0].fecha,
                                 autor: ofertas[0].autor,
                                 estado: 'no disponible',
-                                comprador: req.session.usuario
+                                comprador: req.session.usuario.email
                             }
                             gestorBD.modificarOferta(crit, oferta, function (result) {
                                 if (result == null) {
@@ -208,7 +209,7 @@ module.exports = function (app, swig, gestorBD) {
     app.get("/oferta/miscompras", function (req, res) {
         let criterio = {
             estado: 'no disponible',
-            comprador: req.session.usuario
+            comprador: req.session.usuario.email
         };
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
             if (ofertas == null) {

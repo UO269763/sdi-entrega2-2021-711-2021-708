@@ -124,8 +124,8 @@ module.exports = function (app, swig, gestorBD) {
     })
 
     app.get('/usuario/borrar/:id', function (req, res) {
-        let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.borrarUsuario(criterio, function (deleted) {
+            let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
             if (deleted == null)
                 res.send("error al borrar");
             else //borramos el usuario, volvemos a cargar la tabla

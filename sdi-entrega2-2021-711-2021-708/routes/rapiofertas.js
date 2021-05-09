@@ -1,28 +1,28 @@
-module.exports = function(app, gestorBD) {
+module.exports = function (app, gestorBD) {
 
-    app.post("/api/autenticar/", function (req, res){
+    app.post("/api/autenticar/", function (req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
 
-        let criterio=  {
-            email:req.body.email,
+        let criterio = {
+            email: req.body.email,
             password: seguro
         }
 
-        gestorBD.obtenerUsuarios(criterio, function(usuarios){
-            if (usuarios==null || usuarios.length == 0){
+        gestorBD.obtenerUsuarios(criterio, function (usuarios) {
+            if (usuarios == null || usuarios.length == 0) {
                 res.status(401); //unauthorized
                 res.json({
-                    autenticado:false
+                    autenticado: false
                 })
             } else {
                 let token = app.get('jwt').sign(
-                        {usuario: criterio.email , tiempo: Date.now()/1000},
-                        "secreto");
+                    {usuario: criterio.email, tiempo: Date.now() / 1000},
+                    "secreto");
 
                 res.status(200);
                 res.json({
-                    autenticado:true,
-                    token : token
+                    autenticado: true,
+                    token: token
                 })
             }
         });
@@ -41,7 +41,7 @@ module.exports = function(app, gestorBD) {
                 // dejamos correr la petición
                 let usuario = infoToken.usuario;
                 let cri = {
-                    autor: {$ne: res.usuario },
+                    autor: {$ne: res.usuario},
                     estado: {$ne: 'no disponible'}
                 };
                 gestorBD.obtenerOfertas(cri, function (ofertas) {
@@ -63,84 +63,87 @@ module.exports = function(app, gestorBD) {
     app.post('/api/oferta/mensaje/:id', function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
-            if (err) {
-                res.status(403); // Forbidden
-                res.json({
-                    acceso: false,
-                    error: 'Token invalido o caducado'
-                });
-            } else {
-                let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-                gestorBD.obtenerOfertas(criterio, function (ofertas) {
-                    if (ofertas == null || ofertas.length === 0) {
-                        res.status(403);
-                        res.json({err: "No hay resultados"});
-                    } else {
-                        let usuario = infoToken.usuario;
-                        let oferta = ofertas[0];
-                        let criterio = {
-                            $or: [
-                                {
-                                    user1: usuario,
-                                    user2: ofertas[0].autor,
-                                    offer: gestorBD.mongo.ObjectID(req.params.id)
-                                },
-                                {
-                                    user1: ofertas[0].autor,
-                                    user2: usuario,
-                                    offer: gestorBD.mongo.ObjectID(req.params.id)
-                                }
-                            ]
-                        };
-
-                        //Obtenemos las conversaciones
-                        gestorBD.obtenerConversaciones(criterio, function (conversacion) {
-                            if (conversacion == null || conversacion.length === 0) {
-                                var nuevaConver = {
-                                    offer: gestorBD.mongo.ObjectID(oferta._id),
-                                    title: oferta.nombre,
-                                    user1: req.body.receiver,
-                                    user2: usuario,
-                                    valid: true
-                                };
-                                console.log("titulo");
-                                console.log(oferta.nombre);
-                                gestorBD.crearNuevaConversacion(nuevaConver, function (conversacionNueva) {
-                                    if (conversacionNueva === null) {
-                                        res.status(204);
-                                        res.json({error: "No ha sido posible crear la conversación"});
+                if (err) {
+                    res.status(403); // Forbidden
+                    res.json({
+                        acceso: false,
+                        error: 'Token invalido o caducado'
+                    });
+                } else {
+                    let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+                    gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                        if (ofertas == null || ofertas.length === 0) {
+                            res.status(403);
+                            res.json({err: "No hay resultados"});
+                        } else {
+                            let usuario = infoToken.usuario;
+                            console.log("USUARIO" + usuario);
+                            let oferta = ofertas[0];
+                            console.log("OFERTA:autor" + oferta.autor);
+                            let criterio = {
+                                $or: [
+                                    {
+                                        user1: usuario,
+                                        user2: oferta.autor,
+                                        offer: gestorBD.mongo.ObjectID(req.params.id)
+                                    },
+                                    {
+                                        user1: oferta.autor,
+                                        user2: usuario,
+                                        offer: gestorBD.mongo.ObjectID(req.params.id)
+                                    }
+                                ]
+                            };
+                            //Obtenemos las conversaciones
+                            gestorBD.obtenerConversaciones(criterio, function (conversacion) {
+                                    if (conversacion == null || conversacion.length === 0) {
+                                        var nuevaConver = {
+                                            offer: gestorBD.mongo.ObjectID(oferta._id),
+                                            title: oferta.nombre,
+                                            user1: oferta.autor,
+                                            user2: usuario,
+                                            valid: true
+                                        };
+                                        gestorBD.crearNuevaConversacion(nuevaConver, function (conversacionNueva) {
+                                            if (conversacionNueva === null) {
+                                                res.status(204);
+                                                res.json({error: "No ha sido posible crear la conversación"});
+                                            } else {
+                                                enviarMensaje(
+                                                    req.body.message,
+                                                    usuario,
+                                                    req.body.receiver,
+                                                    conversacionNueva,
+                                                    oferta._id,
+                                                    req,
+                                                    res);
+                                            }
+                                        });
                                     } else {
+                                        //si el receptor es nulo consideramos que el propietario esta enviando el mensaje
                                         enviarMensaje(
                                             req.body.message,
                                             usuario,
                                             req.body.receiver,
-                                            conversacionNueva,
+                                            conversacion[0]._id,
                                             oferta._id,
-                                            req,
-                                            res);
+                                            req, res);
                                     }
-                                });
-                            } else {
-                                //si el receptor es nulo consideramos que el propietario esta enviando el mensaje
-                                enviarMensaje(
-                                    req.body.message,
-                                    usuario,
-                                    req.body.receiver,
-                                    conversacion[0]._id,
-                                    oferta._id,
-                                    req, res);
-                            }
-                        });
-                    }
-                });
+                                }
+                            );
+                        }
+                    });
+                }
             }
-        });
-    });
+        )
+        ;
+    })
+    ;
 
     function enviarMensaje(text, sender, receiver, convId, offerId, req, res) {
 
         let message = {
-            sender: sender,
+            sender: res.usuario,
             receiver: receiver,
             offer: offerId,
             message: text,
@@ -281,7 +284,6 @@ module.exports = function(app, gestorBD) {
             } else {
                 res.send(conver);
                 console.log(conver);
-                console.log("hola");
             }
         });
     });
@@ -338,18 +340,17 @@ module.exports = function(app, gestorBD) {
                     acceso: false,
                     error: 'Token invalido o caducado'
                 });
-            }
-            else {
+            } else {
                 let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
                 gestorBD.obtenerOfertas(criterio, function (ofertas) {
                     if (ofertas == null || ofertas.length === 0) {
                         res.status(403);
-                        res.json({ err: "No hay resultados" });
-                    }
-                    else {
+                        res.json({err: "No hay resultados"});
+                    } else {
                         let usuario = res.usuario;
                         let oferta = ofertas[0];
-                        let criterio = {$or: [
+                        let criterio = {
+                            $or: [
                                 {
                                     user1: usuario,
                                     user2: ofertas[0].autor,
@@ -360,15 +361,15 @@ module.exports = function(app, gestorBD) {
                                     user2: usuario,
                                     offer: gestorBD.mongo.ObjectID(req.params.id)
                                 }
-                            ]};
+                            ]
+                        };
 
                         //Obtenemos las conversaciones
                         gestorBD.obtenerConversaciones(criterio, function (conversacion) {
                             if (conversacion == null) {
                                 res.status(500);
-                                res.json({ error: "Se ha producido un error" });
-                            }
-                            else if (conversacion.length === 0) {
+                                res.json({error: "Se ha producido un error"});
+                            } else if (conversacion.length === 0) {
 
                                 var nuevaConver = {
                                     offer: gestorBD.mongo.ObjectID(oferta._id),
@@ -403,7 +404,6 @@ module.exports = function(app, gestorBD) {
         });
 
     });
-
 
 
 }

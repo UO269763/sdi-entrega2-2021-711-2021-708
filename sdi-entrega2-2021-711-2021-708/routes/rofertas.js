@@ -125,11 +125,11 @@ module.exports = function (app, swig, gestorBD) {
             if (ofertas == null) {
                 res.send("Error al listar ");
             } else {
-                let ultimaPg = total / 5;
-                if (total % 5 > 0) { // Sobran decimales
+                let ultimaPg = total / 4;
+                if (total % 4 > 0) {
                     ultimaPg = ultimaPg + 1;
                 }
-                let paginas = []; // paginas mostrar
+                let paginas = [];
                 for (let i = pg - 2; i <= pg + 2; i++) {
                     if (i > 0 && i <= ultimaPg) {
                         paginas.push(i);

@@ -98,11 +98,13 @@ module.exports = function(app, gestorBD) {
                             if (conversacion == null || conversacion.length === 0) {
                                 var nuevaConver = {
                                     offer: gestorBD.mongo.ObjectID(oferta._id),
-                                    title: oferta.title,
+                                    title: oferta.nombre,
                                     user1: req.body.receiver,
                                     user2: usuario,
                                     valid: true
                                 };
+                                console.log("titulo");
+                                console.log(oferta.nombre);
                                 gestorBD.crearNuevaConversacion(nuevaConver, function (conversacionNueva) {
                                     if (conversacionNueva === null) {
                                         res.status(204);
@@ -140,7 +142,7 @@ module.exports = function(app, gestorBD) {
         let message = {
             sender: sender,
             receiver: receiver,
-            oferta: offerId,
+            offer: offerId,
             message: text,
             fecha: new Date(),
             read: false,
@@ -220,12 +222,12 @@ module.exports = function(app, gestorBD) {
                                 {
                                     sender: user,
                                     receiver: autor,
-                                    oferta: gestorBD.mongo.ObjectID(req.body.id)
+                                    offer: gestorBD.mongo.ObjectID(req.body.id)
                                 },
                                 {
                                     sender: autor,
                                     receiver: user,
-                                    oferta: gestorBD.mongo.ObjectID(req.body.id)
+                                    offer: gestorBD.mongo.ObjectID(req.body.id)
                                 }
                             ]
                         };
@@ -278,6 +280,8 @@ module.exports = function(app, gestorBD) {
                 })
             } else {
                 res.send(conver);
+                console.log(conver);
+                console.log("hola");
             }
         });
     });
@@ -368,7 +372,7 @@ module.exports = function(app, gestorBD) {
 
                                 var nuevaConver = {
                                     offer: gestorBD.mongo.ObjectID(oferta._id),
-                                    title: oferta.title,
+                                    title: oferta.nombre,
                                     user1: oferta.autor,
                                     user2: usuario,
                                     valid: true

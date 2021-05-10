@@ -158,7 +158,7 @@ module.exports = function (app, swig, gestorBD) {
      */
     app.get('/oferta/comprar/:id', function (req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        console.log(req.session.usuario.email);
+      //  console.log(req.session.usuario.email);
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
             if (ofertas == null) {
                 res.send("Error al obtener ofertas");

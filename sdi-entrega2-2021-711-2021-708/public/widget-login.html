@@ -41,9 +41,10 @@
             },
             dataType: 'json',
             success: function(respuesta){
-                console.log(respuesta.token);  // <- Prueba
                 token = respuesta.token;
+                email = $("#email").val();
                 Cookies.set('token', respuesta.token);
+                Cookies.set('lemail', email);
                 $("#contenedor-principal").load("widget-ofertas.html");
             },
             error : function (eror) {

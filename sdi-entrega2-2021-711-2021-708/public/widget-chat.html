@@ -44,7 +44,7 @@
             success: function (respuesta) {
 
                 conversacionid = respuesta;
-                mostrarMensaje(conversacionid._id);
+                mostrarConver(conversacionid._id);
 
             },
             error: function () {
@@ -54,7 +54,7 @@
         });
     }
 
-    function mostrarMensaje(conversacionid ) {
+    function mostrarConver(conversacionid ) {
         let token = Cookies.get('token');
         $.ajax({
             url: URLbase + "/oferta/conversacion/" + conversacionid,
@@ -75,13 +75,14 @@
 
         $("#currentChatContent").empty();
         for (var i = 0; i < messages.length; i++) {
-
             var message = "";
+            console.log("RECEPTOR DEL MENSAJE" + messages[i].receiver)
+            console.log("ACTUAL USUARIO EN SESION" + Cookies.get('semail'))
             if (messages[i].receiver === Cookies.get('semail')) {
                 message = "<div class='currentChatContent'>" +
                     "<div class='message sent'>"  +
                     "<div class='messageContent'>" + messages[i].message + "</div>" +
-                    "<div class='messageTime'>" + timeStamp(new Date(messages[i].date)) + "</div>";
+                    "<div class='messageTime'>" + messages[i].fecha + "</div>";
                 if (messages[i].read) {
                     message += "<div class='messageTime'>"+'✔✔' + "</div>";
                 }
@@ -89,15 +90,14 @@
                     message += "<div class='messageTime'>"+'✈' + "</div>";
                 }
                 message += "</div>";
-            }
-            else{
+            } else {
                 leerMensaje(messages[i]._id.toString());
 
 
                 message = "<div class='currentChatContent'>" +
                     "<div class='message received'>"+
                     "<div class='messageContent'>" + messages[i].message + "</div>" +
-                    "<div class='messageTime'>" +  timeStamp(new Date(messages[i].date))  + "</div>" ;
+                    "<div class='messageTime'>" +  messages[i].fecha  + "</div>" ;
 
                 message += "</div>" ;
 
@@ -114,7 +114,7 @@
                 url: URLbase + "/oferta/mensaje/" + idOferta,
                 type: "POST",
                 data: {
-                    receiver: Cookies.get('emailO'),
+                    receiver: Cookies.get('semail'),
                     message: $("#inputMessage").val(),
                     token: token
                 },
@@ -144,27 +144,6 @@
                 $("#contenedor-principal").load("widget-conversaciones.html");
             }
         });
-    }
-
-    function timeStamp(now) {
-        // Create an array with the current month, day and time
-        var date = [now.getMonth() + 1, now.getDate(), now.getFullYear()];
-        // Create an array with the current hour, minute and second
-        var time = [now.getHours(), now.getMinutes(), now.getSeconds()];
-        // Determine AM or PM suffix based on the hour
-        var suffix = (time[0] < 12) ? "AM" : "PM";
-        // Convert hour from military time
-        time[0] = (time[0] < 12) ? time[0] : time[0] - 12;
-        // If hour is 0, set it to 12
-        time[0] = time[0] || 12;
-        // If seconds and minutes are less than 10, add a zero
-        for (var i = 1; i < 3; i++) {
-            if (time[i] < 10) {
-                time[i] = "0" + time[i];
-            }
-        }
-        // Return the formatted string
-        return date.join("/") + " " + time.join(":") + " " + suffix;
     }
 
     cargarConversaciones();

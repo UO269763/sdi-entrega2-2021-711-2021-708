@@ -26,11 +26,12 @@
 
     function cargarConversaciones() {
         $.ajax({
-            url: URLbase + "/oferta/listaConver/" ,
+            url: URLbase + "/oferta/conversacion/list" ,
             type: "POST",
             data: {},
             dataType: 'json',
-            headers: {"token": Cookies.get('token')},
+            headers: {"token": Cookies.get('token'),
+            "semail": Cookies.get('')},
             success: function (respuesta) {
                 let conversaciones = respuesta;
                 actualizarTabla(conversaciones);
@@ -43,20 +44,36 @@
 
     function actualizarTabla(conversacionesMostrar) {
         $("#tablaCuerpo").empty(); // Vaciar la tabla
+        //debemos dejar eliminar la conversación solo al que la ha iniciado
         for (let i = 0; i < conversacionesMostrar.length; i++) {
-            $("#tablaCuerpo").append(
-                "<tr id=" + conversacionesMostrar[i]._id + ">" +
-                "<td>" + conversacionesMostrar[i].user1 + "</td>" +
-                "<td>" + (conversacionesMostrar[i].title + "hola") + "</td>" +
-                "<td><a id='sendMessageConver' class='btn btn-primary' onclick=cargarChat('"
-                + conversacionesMostrar[i].offer.toString()
-                + "','"
-                + conversacionesMostrar[i].user1+ "','"
-                + conversacionesMostrar[i].user2+ "')>Enviar mensaje</a></td>" +
-                "<td><a id='deleteMessage'class='btn btn-primary' onclick=eliminarConversacion('"
-                + conversacionesMostrar[i]._id + "')>Eliminar conversación</a></td>" +
-                "</tr>"
-            );
+            if (conversacionesMostrar[i].user2 === Cookies.get("lemail")){
+                $("#tablaCuerpo").append(
+                    "<tr id=" + conversacionesMostrar[i]._id + ">" +
+                    "<td>" + conversacionesMostrar[i].user1 + "</td>" +
+                    "<td>" + (conversacionesMostrar[i].title) + "</td>" +
+                    "<td><a id='sendMessageConver' class='btn btn-primary' onclick=cargarChat('"
+                    + conversacionesMostrar[i].offer.toString()
+                    + "','"
+                    + conversacionesMostrar[i].user1+ "','"
+                    + conversacionesMostrar[i].user2+ "')>Enviar mensaje</a></td>" +
+                    "<td><a id='deleteMessage'class='btn btn-primary' onclick=eliminarConversacion('"
+                    + conversacionesMostrar[i]._id + "')>Eliminar conversación</a></td>" +
+                    "</tr>"
+                );
+            } else {
+                $("#tablaCuerpo").append(
+                    "<tr id=" + conversacionesMostrar[i]._id + ">" +
+                    "<td>" + conversacionesMostrar[i].user1 + "</td>" +
+                    "<td>" + (conversacionesMostrar[i].title) + "</td>" +
+                    "<td><a id='sendMessageConver' class='btn btn-primary' onclick=cargarChat('"
+                    + conversacionesMostrar[i].offer.toString()
+                    + "','"
+                    + conversacionesMostrar[i].user1+ "','"
+                    + conversacionesMostrar[i].user2+ "')>Enviar mensaje</a></td>" +
+                    "</tr>"
+                );
+            }
+
         }
     }
 
@@ -87,12 +104,11 @@
         demail = email1;
         remail = email2;
         Cookies.set('idOferta',idOferta);
-
-        if(semail===Cookies.get('lemail'))
+        if(demail===Cookies.get('lemail'))
         {
             emaild = email2;
             Cookies.set('semail',remail);
-        }else
+        } else
         {
             emaild= email1;
             Cookies.set('semail',demail);

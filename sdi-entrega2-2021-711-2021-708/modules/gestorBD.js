@@ -61,12 +61,11 @@ module.exports = {
                 funcionCallback(null);
             }else{
                 let collection=db.collection('usuarios');
-                collection.deleteOne(criterio,function (err,deleted){
-                    if(err){
+                collection.remove(criterio, function (err, result) {
+                    if (err) {
                         funcionCallback(null);
-                    }
-                    else{
-                        funcionCallback(deleted);
+                    } else {
+                        funcionCallback(result);
                     }
 
                     db.close();
@@ -266,7 +265,26 @@ module.exports = {
                 });
             }
         });
-    }, obtenerListadoOfertasPg: function (criterio, pg, funcionCallback) {
+    },
+    borrarOfertas : function(criterio,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'),function (err,db){
+            if(err){
+                funcionCallback(null);
+            }else{
+                let collection=db.collection('ofertas');
+                collection.deleteOne(criterio,function (err,deleted){
+                    if(err){
+                        funcionCallback(null);
+                    }
+                    else{
+                        funcionCallback(deleted);
+                    }
+
+                    db.close();
+                });
+            }
+        });
+    },obtenerListadoOfertasPg: function (criterio, pg, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);

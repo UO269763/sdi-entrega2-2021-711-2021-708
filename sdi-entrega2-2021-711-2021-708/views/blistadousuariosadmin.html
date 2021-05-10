@@ -3,12 +3,10 @@
 {% block contenido_principal %}
 <h2>Usuarios</h2>
 
-<button class="btn" type="button" id="btEliminar" >Eliminar</button>
-
 <!-- Agregar Canción -->
 <div class="table-responsive">
 
-
+    <form method="POST" action="/usuario/borrar">
     <table class="table table-hover">
         <thead>
         <tr>
@@ -21,59 +19,23 @@
         </thead>
         <tbody id="cuerpo">
         {% for usuario in usuarios %}
-        {% if usuario.email != 'admin@email.es' %}
         <tr>
-            <td><input class = "checkbox" type="checkbox" name="checkbox" id={{ usuario._id.toString() }}></td>
+            <td><input class = "checkbox" type="checkbox" name="checkbox" value={{ usuario.email }}></td>
             <td>{{ usuario.email }}</td>
             <td>{{ usuario.nombre }}</td>
             <td>{{ usuario.apellidos }}</td>
         </tr>
-        {% endif%}
         {% endfor %}
         </tbody>
     </table>
+        <div class="form-group">
+            <input class="btn btn-danger" type="submit" id="btEliminar"
+                   value="Eliminar"/>
+
+
+        </div>
+</form>
 </div>
-
-<script>
-    $('#btEliminar').on('click', function() {
-        let e = document.getElementsByName('checkbox');
-        let usuariossinborrar;
-        for (i = 0; i < e.length; i++){
-            if (e[i].checked==true){
-                $.ajax({
-                    url: "/usuario/borrar/"+e[i].id,
-                    data: {},
-                    dataType: 'json',
-                    success: function(respuesta) {
-                        usuariossinborrar = respuesta;
-                        actualizarTabla(usuariossinborrar);
-                    },
-                    error : function (error){
-                        console.log(error);
-                    }
-                })
-            }
-        }
-    });
-
-    function actualizarTabla(usuariosMostrar){
-        console.log(usuariosMostrar);
-        $("#cuerpo").empty(); //vaciamos la tabla
-        for (i=0;i<usuariosMostrar.length;i++){
-            $("#cuerpo").append(
-                "<tr>" +
-                "<td><input class = 'checkbox' type='checkbox' name='checkbox' id=" +  usuariosMostrar[i]._id +"></td>" +
-                "<td>"+ usuariosMostrar[i].email +"</td>"+
-                "<td>"+ usuariosMostrar[i].nombre + "</td>"+
-                "<td>"+ usuariosMostrar[i].apellidos + "</td>"+
-                "</tr>");
-        }
-    }
-
-
-
-
-</script>
 
 
 {% endblock %}

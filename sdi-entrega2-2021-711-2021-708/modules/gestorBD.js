@@ -61,12 +61,11 @@ module.exports = {
                 funcionCallback(null);
             }else{
                 let collection=db.collection('usuarios');
-                collection.deleteOne(criterio,function (err,deleted){
-                    if(err){
+                collection.remove(criterio, function (err, result) {
+                    if (err) {
                         funcionCallback(null);
-                    }
-                    else{
-                        funcionCallback(deleted);
+                    } else {
+                        funcionCallback(result);
                     }
 
                     db.close();

@@ -1,5 +1,6 @@
 module.exports = function (app, gestorBD) {
 
+    //AUTENTICACION
     app.post("/api/autenticar/", function (req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
 
@@ -28,6 +29,7 @@ module.exports = function (app, gestorBD) {
         });
     });
 
+    //MOSTRAR EL LISTADO DE OFERTAS DISPONIBLES
     app.get("/api/oferta", function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
@@ -59,7 +61,7 @@ module.exports = function (app, gestorBD) {
         })
     });
 
-    // Segun id de la oferta
+    // ENVIAR MENSAJE A UNA OFERTA
     app.post('/api/oferta/mensaje/:id', function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
@@ -77,20 +79,16 @@ module.exports = function (app, gestorBD) {
                             res.json({err: "No hay resultados"});
                         } else {
                             let usuario = infoToken.usuario;
-                            console.log("USUARIO" + usuario);
                             let oferta = ofertas[0];
-                            console.log("OFERTA:autor" + oferta.autor);
                             let criterio = {
                                 $or: [
                                     {
                                         user1: usuario,
-                                        user2: oferta.autor,
-                                        offer: gestorBD.mongo.ObjectID(req.params.id)
+                                        offer: oferta._id
                                     },
                                     {
                                         user1: oferta.autor,
-                                        user2: usuario,
-                                        offer: gestorBD.mongo.ObjectID(req.params.id)
+                                        offer: oferta._id
                                     }
                                 ]
                             };
@@ -100,8 +98,8 @@ module.exports = function (app, gestorBD) {
                                         var nuevaConver = {
                                             offer: gestorBD.mongo.ObjectID(oferta._id),
                                             title: oferta.nombre,
-                                            user1: oferta.autor,
-                                            user2: usuario,
+                                            user1: usuario,
+                                            user2: oferta.autor,
                                             valid: true
                                         };
                                         gestorBD.crearNuevaConversacion(nuevaConver, function (conversacionNueva) {
@@ -112,7 +110,7 @@ module.exports = function (app, gestorBD) {
                                                 enviarMensaje(
                                                     req.body.message,
                                                     usuario,
-                                                    req.body.receiver,
+                                                    oferta.autor,
                                                     conversacionNueva,
                                                     oferta._id,
                                                     req,
@@ -135,19 +133,16 @@ module.exports = function (app, gestorBD) {
                     });
                 }
             }
-        )
-        ;
-    })
-    ;
+        );
+    });
 
     function enviarMensaje(text, sender, receiver, convId, offerId, req, res) {
-
         let message = {
-            sender: res.usuario,
+            sender: sender,
             receiver: receiver,
             offer: offerId,
             message: text,
-            fecha: new Date(),
+            fecha: new Date().toDateString(),
             read: false,
             idConversacion: convId
         };
@@ -165,6 +160,7 @@ module.exports = function (app, gestorBD) {
 
     }
 
+    // carga conversacion y sus mensajes
     app.get("/api/oferta/conversacion/:id", function (req, res) {
         let crit = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.obtenerConversaciones(crit, function (conversaciones) {
@@ -260,20 +256,19 @@ module.exports = function (app, gestorBD) {
         gestorBD.marcarLeido(criterio, function (mensajes) {
             if (mensajes == null) {
                 res.status(500);
-                app.get("logger").error('API: Se ha producido un error al leer mensajes');
+
 
                 res.json({
                     error: "se ha producido un error"
                 })
             } else {
                 res.status(200);
-                app.get("logger").info('API: Se ha leido mensaje');
                 res.send(mensajes);
             }
         })
     });
 
-    app.post("/api/oferta/listaConver/", function (req, res) {
+    app.post("/api/oferta/conversacion/list", function (req, res) {
         let criterio = {$or: [{user1: res.usuario}, {user2: res.usuario}]};
         gestorBD.obtenerConversaciones(criterio, function (conver) {
             if (conver == null) {
@@ -283,7 +278,7 @@ module.exports = function (app, gestorBD) {
                 })
             } else {
                 res.send(conver);
-                console.log(conver);
+
             }
         });
     });
@@ -332,10 +327,11 @@ module.exports = function (app, gestorBD) {
     });
 
     app.post('/api/buscar/oferta/conversacion/:id', function (req, res) {
-        let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        gestorBD.obtenerOfertas(criterio, function (ofertas) {
-            if (ofertas == null || ofertas.length === 0) {
-                res.status(403);
+
+        let token = req.headers['token'] || req.body.token || req.query.token;
+        app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
+            if (err) {
+                res.status(403); // Forbidden
                 res.json({
                     acceso: false,
                     error: 'Token invalido o caducado'
@@ -345,32 +341,31 @@ module.exports = function (app, gestorBD) {
                 gestorBD.obtenerOfertas(criterio, function (ofertas) {
                     if (ofertas == null || ofertas.length === 0) {
                         res.status(403);
-                        res.json({err: "No hay resultados"});
+                        res.json({
+                            acceso: false,
+                            error: 'Token invalido o caducado'
+                        });
                     } else {
-                        let usuario = res.usuario;
+                        let usuario = infoToken.usuario;
                         let oferta = ofertas[0];
                         let criterio = {
                             $or: [
                                 {
                                     user1: usuario,
-                                    user2: ofertas[0].autor,
-                                    offer: gestorBD.mongo.ObjectID(req.params.id)
+                                    offer: oferta._id
                                 },
                                 {
-                                    user1: ofertas[0].autor,
-                                    user2: usuario,
-                                    offer: gestorBD.mongo.ObjectID(req.params.id)
+                                    user1: oferta.autor,
+                                    offer: oferta._id
                                 }
                             ]
                         };
-
-                        //Obtenemos las conversaciones
                         gestorBD.obtenerConversaciones(criterio, function (conversacion) {
+
                             if (conversacion == null) {
                                 res.status(500);
                                 res.json({error: "Se ha producido un error"});
                             } else if (conversacion.length === 0) {
-
                                 var nuevaConver = {
                                     offer: gestorBD.mongo.ObjectID(oferta._id),
                                     title: oferta.nombre,
@@ -401,9 +396,6 @@ module.exports = function (app, gestorBD) {
                     }
                 });
             }
-        });
-
+        })
     });
-
-
 }

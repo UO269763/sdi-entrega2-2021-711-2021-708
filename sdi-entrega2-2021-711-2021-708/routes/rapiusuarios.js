@@ -12,6 +12,7 @@ module.exports = function(app, gestorBD) {
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if(usuarios == null || usuarios.length == 0) {
                 res.status(401);
+                app.get("logger").info('API: Error al obtener los usuarios');
                 res.json({
                     autenticado : false
                 })
@@ -21,6 +22,7 @@ module.exports = function(app, gestorBD) {
                     "secreto");
 
                 res.status(200);
+                app.get("logger").info('API: Usuario autenticado correctamente');
                 res.json({
                     autenticado : true,
                     email : criterio.email,

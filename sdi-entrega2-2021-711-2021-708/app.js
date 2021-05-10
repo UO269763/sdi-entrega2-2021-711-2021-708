@@ -17,6 +17,14 @@ app.use(function(req, res, next) {
 let jwt = require('jsonwebtoken');
 app.set('jwt',jwt);
 
+let log4js = require('log4js');
+log4js.configure({
+    appenders: {wallapop: {type: 'file', filename: 'logs/wallapop.log'}},
+    categories: {default: {appenders: ['wallapop'], level: 'trace'}}
+});
+let logger = log4js.getLogger('wallapop');
+app.set('logger', logger);
+
 let fs = require('fs');
 let https = require('https');
 

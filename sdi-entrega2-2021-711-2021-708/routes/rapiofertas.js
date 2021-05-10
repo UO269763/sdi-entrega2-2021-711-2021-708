@@ -32,6 +32,7 @@ module.exports = function(app, gestorBD) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
             if (err) {
+                app.get("logger").error('API: Token no valido');
                 res.status(403); // Forbidden
                 res.json({
                     acceso: false,
@@ -46,11 +47,13 @@ module.exports = function(app, gestorBD) {
                 };
                 gestorBD.obtenerOfertas(cri, function (ofertas) {
                     if (ofertas == null || ofertas.length === 0 || ofertas === undefined) {
+                        app.get("logger").error('No se puede obtener la oferta');
                         res.status(204); // Unauthorized
                         res.json({
                             err: "No hay resultados"
                         });
                     } else {
+                        app.get("logger").info('API: Mostradas las ofertas disponibles ');
                         res.status(200);
                         res.send(ofertas);
                     }
@@ -64,6 +67,7 @@ module.exports = function(app, gestorBD) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
             if (err) {
+                app.get("logger").error('API: Token no valido');
                 res.status(403); // Forbidden
                 res.json({
                     acceso: false,
@@ -73,6 +77,7 @@ module.exports = function(app, gestorBD) {
                 let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
                 gestorBD.obtenerOfertas(criterio, function (ofertas) {
                     if (ofertas == null || ofertas.length === 0) {
+                        app.get("logger").info('API: Error al obtener ofertas');
                         res.status(403);
                         res.json({err: "No hay resultados"});
                     } else {
@@ -107,6 +112,7 @@ module.exports = function(app, gestorBD) {
                                 console.log(oferta.nombre);
                                 gestorBD.crearNuevaConversacion(nuevaConver, function (conversacionNueva) {
                                     if (conversacionNueva === null) {
+                                        app.get("logger").info('API: Error al crear la conversacion');
                                         res.status(204);
                                         res.json({error: "No ha sido posible crear la conversación"});
                                     } else {
@@ -151,11 +157,13 @@ module.exports = function(app, gestorBD) {
         gestorBD.insertarMensaje(message, function (mensaje) {
             if (mensaje == null) {
                 res.status(500); // error del servidor
+                app.get("logger").info('API: Error al insertar el mensaje');
                 res.json({
                     err: "Error del servidor"
                 });
             } else {
                 res.status(200);
+                app.get("logger").info('API: Se ha insertado el mensaje');
                 res.json(mensaje);
             }
         });
@@ -167,6 +175,7 @@ module.exports = function(app, gestorBD) {
         gestorBD.obtenerConversaciones(crit, function (conversaciones) {
             if (conversaciones == null) {
                 res.status(500);
+                app.get("logger").info('API: Error al obtener la conversacion');
                 res.json({error: "Se ha producido un error"});
             } else if (conversaciones.length === 0) {
                 res.status(200);
@@ -179,11 +188,13 @@ module.exports = function(app, gestorBD) {
                 gestorBD.obtenerMensajes(criterio, function (mensajes) {
                     if (mensajes == null) {
                         res.status(500);
+                        app.get("logger").info('API: Error al obtener el mensaje');
                         res.json({
                             error: "Ha habido un error"
                         })
                     } else {
                         res.status(200);
+                        app.get("logger").info('API: Mensaje obtenido correctamente');
                         res.json(mensajes);
                     }
                 });
@@ -197,6 +208,7 @@ module.exports = function(app, gestorBD) {
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
             if (err) {
                 res.status(403); // Forbidden
+                app.get("logger").info('API: Token no valido');
                 res.json({
                     acceso: false,
                     error: 'Token invalido o caducado'
@@ -206,11 +218,13 @@ module.exports = function(app, gestorBD) {
                 gestorBD.obtenerOfertas(crit, function (ofertas) {
                     if (ofertas == null) {
                         res.status(500);
+                        app.get("logger").info('API: Error al obtener la oferta');
                         res.json({
                             error: "se ha producido un error"
                         })
                     } else if (ofertas.length === 0) {
                         res.status(400);
+                        app.get("logger").info('API: Error, no se encuentra la oferta');
                         res.json({
                             error: "Oferta no encontrada"
                         })
@@ -234,11 +248,13 @@ module.exports = function(app, gestorBD) {
                         gestorBD.eliminarMensajes(criterio, function (mensajes) {
                             if (mensajes == null) {
                                 res.status(500);
+                                app.get("logger").info('API: Error al eliminar el mensaje');
                                 res.json({
                                     error: "se ha producido un error"
                                 })
                             } else {
                                 res.status(200);
+                                app.get("logger").info('API: Se ha eliminado correctamente el mensaje');
                                 res.send(mensajes);
                             }
                         });
@@ -274,11 +290,13 @@ module.exports = function(app, gestorBD) {
         let criterio = {$or: [{user1: res.usuario}, {user2: res.usuario}]};
         gestorBD.obtenerConversaciones(criterio, function (conver) {
             if (conver == null) {
-                res.status(500);
+                res.status(500)
+                app.get("logger").info('API: Error mostrando las conversaciones');
                 res.json({
                     error: "Se ha producido un error"
                 })
             } else {
+                app.get("logger").info('API: Se han listado las conversaciones');
                 res.send(conver);
                 console.log(conver);
                 console.log("hola");
@@ -294,11 +312,13 @@ module.exports = function(app, gestorBD) {
         gestorBD.obtenerMensajes(criterio, function (mensajes) {
             if (mensajes == null) {
                 res.status(500);
+                app.get("logger").info('API: Error mostrando los mensajes');
                 res.json({
                     error: "se ha producido un error"
                 })
             } else if (mensajes.length === 0) {
                 res.status(400);
+                app.get("logger").info('API: Error mostrando los mensajes');
                 res.json({
                     error: "NO se ha encontrado la oferta"
                 })
@@ -306,6 +326,7 @@ module.exports = function(app, gestorBD) {
                 gestorBD.eliminarMensajes(criterio, function (mensajes) {
                     if (mensajes == null) {
                         res.status(500);
+                        app.get("logger").info('API: Error eliminando los mensajes');
                         res.json({
                             error: "se ha producido un error"
                         })
@@ -314,11 +335,13 @@ module.exports = function(app, gestorBD) {
                         gestorBD.eliminarConversaciones(criterioConversacion, function (mensajes) {
                             if (mensajes == null) {
                                 res.status(500);
+                                app.get("logger").info('API: Error eliminando los mensajes');
                                 res.json({
                                     error: "se ha producido un error"
                                 })
                             } else {
                                 res.status(200);
+                                app.get("logger").info('API: Se han eliminado los mensajes');
                                 res.send((mensajes));
                             }
                         });
@@ -334,6 +357,7 @@ module.exports = function(app, gestorBD) {
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
             if (ofertas == null || ofertas.length === 0) {
                 res.status(403);
+                app.get("logger").info('API: Error al obtener la oferta');
                 res.json({
                     acceso: false,
                     error: 'Token invalido o caducado'
@@ -344,6 +368,7 @@ module.exports = function(app, gestorBD) {
                 gestorBD.obtenerOfertas(criterio, function (ofertas) {
                     if (ofertas == null || ofertas.length === 0) {
                         res.status(403);
+                        app.get("logger").info('API: Error al obtener la oferta');
                         res.json({ err: "No hay resultados" });
                     }
                     else {
@@ -366,10 +391,11 @@ module.exports = function(app, gestorBD) {
                         gestorBD.obtenerConversaciones(criterio, function (conversacion) {
                             if (conversacion == null) {
                                 res.status(500);
+                                app.get("logger").info('API: Error al obtener las conversaciones');
                                 res.json({ error: "Se ha producido un error" });
                             }
                             else if (conversacion.length === 0) {
-
+                                app.get("logger").info('API: Conversacion no encontrada');
                                 var nuevaConver = {
                                     offer: gestorBD.mongo.ObjectID(oferta._id),
                                     title: oferta.nombre,
@@ -380,6 +406,7 @@ module.exports = function(app, gestorBD) {
                                 gestorBD.crearNuevaConversacion(nuevaConver, function (conversacionNueva) {
                                     if (conversacionNueva === null) {
                                         res.status(204);
+                                        app.get("logger").info('API: Error al crear la conversacion');
                                         res.json({
                                             error: "No fue posible crear la conversación"
                                         });
@@ -394,6 +421,7 @@ module.exports = function(app, gestorBD) {
                                     }
                                 })
                             } else {
+                                app.get("logger").info('API: Se han listado las conversaciones');
                                 res.send(conversacion[0]);
                             }
                         });

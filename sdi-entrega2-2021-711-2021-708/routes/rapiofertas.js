@@ -90,12 +90,18 @@ module.exports = function (app, gestorBD) {
                                 $or: [
                                     {
                                         user1: usuario,
-                                        user2: oferta.autor,
                                         offer: oferta._id
                                     },
                                     {
                                         user1: oferta.autor,
+                                        offer: oferta._id
+                                    },
+                                    {
                                         user2: usuario,
+                                        offer: oferta._id
+                                    },
+                                    {
+                                        user2: oferta.autor,
                                         offer: oferta._id
                                     }
                                 ]
@@ -127,7 +133,6 @@ module.exports = function (app, gestorBD) {
                                             }
                                         });
                                     } else {
-                                        //si el receptor es nulo consideramos que el propietario esta enviando el mensaje
                                         enviarMensaje(
                                             req.body.message,
                                             usuario,

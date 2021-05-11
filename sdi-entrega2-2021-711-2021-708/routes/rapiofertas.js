@@ -209,31 +209,6 @@ module.exports = function (app, gestorBD) {
         });
     });
 
-    app.post("/api/oferta/conversacion/reload/:id", function (req, res) {
-        let crit = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        gestorBD.obtenerConversaciones(crit, function (conversaciones) {
-            if (conversaciones == null) {
-                res.status(500);
-                app.get("logger").info('API: Error al obtener la conversacion');
-                res.json({error: "Se ha producido un error"});
-            } else if (conversaciones.length === 0) {
-                res.status(200);
-                res.json([]);
-            } else {
-                let conversacion = conversaciones[0];
-                let criterio = {
-                    idConversacion: gestorBD.mongo.ObjectID(conversacion._id),
-                    read: true
-                };
-                gestorBD.obtenerMensajes(criterio, function (mensajes) {
-                    res.status(200);
-                    app.get("logger").info('API: Mensaje obtenido correctamente');
-                    res.json(mensajes);
-
-                });
-            }
-        });
-    })
 
     app.post("/api/mensaje/eliminar/", function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;

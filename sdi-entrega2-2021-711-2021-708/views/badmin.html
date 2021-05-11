@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block contenido_principal %}
+<div class="container">
+
+    <div class="container" style="text-align: center">
+        <h2>Bienvenido admin</h2>
+        <p> Ha sido autenticado como admin.
+        </p>
+        <p> Haga click en el botón para borrar todos los datos!
+        </p>
+        <a class="btn btn-primary" name="resetbd" href="{{'/resetdb'}}">reset DB</a>
+    </div>
+
+</div>
+{% endblock %}

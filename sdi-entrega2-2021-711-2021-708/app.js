@@ -105,13 +105,14 @@ routerUsuarioSession.use(function(req, res, next) {
 //Aplicar routerUsuarioSession
 app.use("/oferta/*",routerUsuarioSession);
 app.use("/usuario/*",routerUsuarioSession);
+app.use("/admin",routerUsuarioSession);
 
 //routerUsuarioAdmin
 let routerUsuarioAdmin = express.Router();
 
 routerUsuarioAdmin.use(function(req, res, next) {
     console.log("routerUsuarioAdmin");
-    if (req.session.usuario !== undefined && req.session.usuario.email === 'admin@email.es') {
+    if (req.session.usuario !== undefined && req.session.usuario.rol === 'admin') {
         // dejamos correr la petición
         next();
     } else {
@@ -120,6 +121,8 @@ routerUsuarioAdmin.use(function(req, res, next) {
 });
 //Aplicar routerUsuarioAdmin
 app.use("/usuario/*" ,routerUsuarioAdmin);
+app.use("/resetdb", routerUsuarioAdmin);
+app.use("/admin", routerUsuarioAdmin);
 
 
 app.use(express.static('public'));
@@ -134,6 +137,7 @@ app.set('crypto',crypto);
 //Rutas/controladores por lógica
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rofertas.js")(app, swig, gestorBD);
+require("./routes/radmin.js")(app, swig, gestorBD);
 require("./routes/rapiofertas.js")(app, gestorBD);
 
 

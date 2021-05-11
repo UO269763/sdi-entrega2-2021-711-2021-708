@@ -47,12 +47,13 @@ module.exports = function (app, swig, gestorBD) {
                         money: 100.0
                     };
                     gestorBD.insertarUsuario(usuario, function (id) {
+
                         if (id == null) {
                             // res.send("Error al insertar el usuario");
                             res.redirect("/registrarse?mensaje=Error al registrar al usuario");
                         } else {
-                            res.redirect("/identificarse?mensaje=Nuevo usuario registrado");
-                            //res.send('Usuario Insertado ' + id);
+                            req.session.usuario = usuario;
+                            res.redirect("/oferta/buscar?mensaje=Nuevo usuario registrado");
                         }
                     });
                 }
@@ -89,10 +90,10 @@ module.exports = function (app, swig, gestorBD) {
                     "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0];
-                if (req.session.usuario.email == "admin@email.es") {
+                if (req.session.usuario.rol == "admin") {
                     res.redirect("/usuario/list");
                 } else {
-                    res.redirect("/oferta/misofertas");
+                    res.redirect("/oferta/buscar");
 
                 }
             }
@@ -188,30 +189,7 @@ module.exports = function (app, swig, gestorBD) {
                 }
             })
         }
-    })
-
-    app.get('/usuario/borrar/:id', function (req, res) {
-
-
-        gestorBD.borrarUsuario(criterio, function (deleted) {
-            let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-            if (deleted == null)
-                res.send("error al borrar");
-            else //borramos el usuario, volvemos a cargar la tabla
-                gestorBD.obtenerTodosUsuarios(function (usuarios) {
-                    if (usuarios == null) {
-                        res.status(500);
-                        res.json({
-                            error: "se ha producido un error al cargar la tabla"
-                        })
-                    } else {
-                        res.status(200);
-                        res.send(JSON.stringify(usuarios));
-                    }
-                })
-        })
     });
-
 
     app.get("/index", function (req, res) {
         let respuesta = swig.renderFile('views/bindex.html',

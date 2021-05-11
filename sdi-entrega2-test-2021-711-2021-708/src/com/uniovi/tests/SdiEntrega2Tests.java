@@ -1,45 +1,38 @@
 package com.uniovi.tests;
 
-//Paquetes Java
-import java.util.List;
-//Paquetes JUnit 
-import org.junit.*;
-import org.junit.runners.MethodSorters;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Random;
+
+//Paquetes JUnit 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 //Paquetes Selenium 
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.*;
-//Paquetes Utilidades de Testing Propias
-import com.uniovi.tests.util.SeleniumUtils;
-//Paquetes con los Page Object
-import com.uniovi.tests.pageobjects.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+import com.uniovi.tests.util.MyUtil;
 
 //Ordenamos las pruebas por el nombre del mÃ©todo
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SdiEntrega2Tests {
+	
+	
+	
+	private MyUtil testUtil = new MyUtil(driver);
 	// En Windows (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens
 	// automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	// static String Geckdriver024 = "C:\\Path\\geckodriver024win64.exe";
-	// En MACOSX (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens
-	// automÃ¡ticas):
-	// static String PathFirefox65 = "/Applications/Firefox
-	// 2.app/Contents/MacOS/firefox-bin";
-	// static String PathFirefox64 =
-	// "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
-	static String Geckdriver024 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver024mac";
-	// static String Geckdriver022 =
-	// "/Users/delacal/Documents/SDI1718/firefox/geckodriver023mac";
-	// ComÃºn a Windows y a MACOSX
+	static String Geckdriver024 =  "C:\\Users\\Usuario\\Desktop\\TERCEROINFORMATICA\\SEGUNDOSEMESTRE\\SDI\\lab\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
-
-	public static WebDriver getDriver(String PathFirefox, String Geckdriver) {
-		System.setProperty("webdriver.firefox.bin", PathFirefox);
-		System.setProperty("webdriver.gecko.driver", Geckdriver);
-		WebDriver driver = new FirefoxDriver();
-		return driver;
-	}
 
 	@Before
 	public void setUp() {
@@ -53,9 +46,20 @@ public class SdiEntrega2Tests {
 
 	@BeforeClass
 	static public void begin() {
-		// COnfiguramos las pruebas.
-		// Fijamos el timeout en cada opciÃ³n de carga de una vista. 2 segundos.
-		PO_View.setTimeout(3);
+		MyUtil testUtil = new MyUtil(driver);
+		driver.get(URL + "/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("admin@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.className("btn-primary")).click();
+		testUtil.waitChangeWeb();
+		driver.get(URL+"/admin");
+		driver.findElement(By.linkText("reset DB")).click();
+		testUtil.waitChangeWeb();
 
 	}
 
@@ -64,16 +68,39 @@ public class SdiEntrega2Tests {
 		// Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
+	
+	public static WebDriver getDriver(String PathFirefox, String Geckdriver) {
+		System.setProperty("webdriver.firefox.bin", PathFirefox);
+		System.setProperty("webdriver.gecko.driver", Geckdriver);
+		WebDriver driver = new FirefoxDriver();
+		return driver;
+	}
 
 	// PR01. Registro usuario, datos validos /
 	@Test
 	public void PR01() {
-		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "signup", "class", "btn btn-primary");
-		// Rellenamos el formulario.
-		PO_RegisterView.fillForm(driver, "pedro@gmail.com", "Pedro", "Garcia", "123456", "123456");
-		// Comprobamos que entramos en la sección privada
-		PO_View.checkElement(driver, "text", "pedro@gmail.com");
+		driver.get(URL);
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		Random n = new Random();
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys(n.nextInt(10000)+"@gmail.com");
+ 		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Ester");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Lopez");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("1234");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("1234");
+		driver.findElement(By.id("aceptar")).click();
+ 		testUtil.searchText("Nuevo usuario registrado", true);
 	}
 
 	/*
@@ -82,19 +109,47 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR02() {
-		PO_HomeView.clickOption(driver, "signup", "id", "signup-bt");
-		PO_RegisterView.fillForm(driver, "", "", "", "123456", "123456");
-		SeleniumUtils.EsperaCargaPagina(driver, "id", "signup-bt", PO_View.getTimeout());
+		driver.get(URL);
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("1234");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("1234");
+		driver.findElement(By.id("aceptar")).click();
+ 		testUtil.searchText("Registrar usuario", true);
 	}
 
 	/*
-	 * Registro de Usuario con datos inválidos (email existente).
+	 * Registro de Usuario con datos inválidos (repetición de contraseña inválida).
 	 */
 	@Test
 	public void PR03() {
-		PO_HomeView.clickOption(driver, "signup", "id", "signup-bt");
-		PO_RegisterView.fillForm(driver, "jose@gmail.com", "Jose", "Martinez", "123456", "123456");
-		PO_View.check(driver, "Las contraseñas no coinciden");
+		driver.get(URL);
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		Random n = new Random();
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys(n.nextInt(10000)+"@gmail.com");
+ 		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Ester");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Lopez");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("1234");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("12345");
+		driver.findElement(By.id("aceptar")).click();
+ 		testUtil.searchText("Registrar usuario", true);
 	}
 
 	/*
@@ -102,12 +157,27 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR04() {
-		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "signup", "class", "btn btn-primary");
-		// Rellenamos el formulario.
-		PO_RegisterView.fillForm(driver, "pedro@gmail.com", "Pedro", "Garcia", "123456", "123456");
-		// Comprobamos que entramos en la sección privada
-		PO_View.check(driver, "Este email ya está registrado. Intentelo de nuevo");
+		driver.get(URL);
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("user1@email.com");
+ 		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Ester");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Lopez");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("1234");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("1234");
+		driver.findElement(By.id("aceptar")).click();
+ 		testUtil.searchText("Este email ya está registrado. Intentelo de nuevo", true);
 	}
 
 	/*
@@ -115,7 +185,18 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR05() {
-		PO_View.login(driver, "pedro@gmail.com");
+		driver.get(URL+ "/identificarse");
+		testUtil.waitChangeWeb();
+ 		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+		
+ 		testUtil.searchText("Mis ofertas", true);
+
 	}
 
 	/*
@@ -124,26 +205,47 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR06() {
-		PO_View.login(driver, "", "", null, true);
-		SeleniumUtils.EsperaCargaPagina(driver, "id", "login-bt", PO_View.getTimeout());
+		driver.get(URL + "/identificarse");
+		testUtil.waitChangeWeb();
+ 		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("ester@gmail.es");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("12345");
+		driver.findElement(By.className("btn-primary")).click();
+ 		testUtil.searchText("Identificación de usuario", true);
 	}
 
 	/*
-	 * Inicio de sesión con datos válidos (usuario estándar, email existente, pero
-	 * contraseña incorrecta).
+	 * Inicio de sesión con datos inválidos (campo email o contraseña vacíos).
 	 */
 	@Test
 	public void PR07() {
-		PO_View.login(driver, "pedro@gmail.com", "comofue", "Email o password incorrectos", true);
+		driver.get(URL + "/identificarse");
+		testUtil.waitChangeWeb();
+ 		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("ester@gmail.es");
+		driver.findElement(By.className("btn-primary")).click();
+ 		testUtil.searchText("Identificación de usuario", true);
 	}
 
 	/*
-	 * Inicio de sesión con datos inválidos (usuario estándar, email no existente y
-	 * contraseña no vacía).
+	 * nicio de sesión con datos inválidos (email no existente en la aplicación).
 	 */
 	@Test
 	public void PR08() {
-		PO_View.login(driver, "comofue@gmail.com", "comofue", "Email o password incorrectos", true);
+		driver.get(URL + "/identificarse");
+		testUtil.waitChangeWeb();
+ 		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("estergonsalves@gmail.es");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("12345");
+		driver.findElement(By.className("btn-primary")).click();
+ 		testUtil.searchText("Email o password incorrecto", true);
 	}
 
 	/*
@@ -152,17 +254,19 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR09() {
-		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-		// Rellenamos el formulario
-		PO_LoginView.fillForm(driver, "admin@email.es", "123456");
-		// COmprobamos que entramos en la pagina privada de usuario
-		PO_View.checkElement(driver, "text", "Gestión de ofertas");
-		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-		// PO_PrivateView.logOut(driver, "Desconectar");
-		//PO_View.checkElement(driver, "text", "Identifícate");
-		SeleniumUtils.EsperaCargaPagina(driver, "id", "login-bt", PO_View.getTimeout());
+		driver.get(URL + "/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Cerrar sesión")).click();
+		testUtil.waitChangeWeb();
+		testUtil.searchText("Identificación de usuario", true);
 	}
 
 	/*
@@ -171,115 +275,590 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR10() {
-		PO_View.checkNoMsg(driver, "Desconectar");
+		driver.get(URL);
+		testUtil.searchText("Cerrar sesión", false);
 	}
 
-	// PR11. Sin hacer /
+	// PR11. Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el
+	// sistema.
 	@Test
 	public void PR11() {
-		assertTrue("PR11 sin hacer", false);
+		driver.get(URL + "/identificarse");
+		testUtil.waitChangeWeb();
+ 		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("admin@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.id("aceptar")).click();
+		testUtil.waitChangeWeb();
+		// comprobamos que no se liste el administrador y que se listen usuarios que
+		// estan en la base de datos
+		testUtil.searchText("Usuarios", true);
+		testUtil.searchText("admin@email.com", false);
+		testUtil.searchText("user1@email.com", true);
+		testUtil.searchText("user2@email.com", true);
+
 	}
 
-	// PR12. Sin hacer /
+	// PR12. Ir a la lista de usuarios, borrar el primer usuario de la lista, comprobar que la lista se
+	// actualiza y dicho usuario desaparece.
+	// el primer usuario que hemos añadido es el user1
 	@Test
 	public void PR12() {
-		assertTrue("PR12 sin hacer", false);
+		driver.get(URL+"/identificarse");
+
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("admin@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.id("aceptar")).click();
+		
+		testUtil.searchText("user1@email.com", true);
+		driver.findElements(By.className("checkbox")).get(0).click();
+		driver.findElement(By.id("btEliminar")).click();
+		testUtil.waitChangeWeb();
+
+		testUtil.searchText("Usuarios", true);
+		testUtil.searchText("admin@email.com", false);
+		testUtil.searchText("user1@email.com", false);
 	}
 
-	// PR13. Sin hacer /
+	// PR13. Ir a la lista de usuarios, borrar el último usuario de la lista, comprobar que la lista se
+	// actualiza y dicho usuario desaparece.
+	// según como está se lista el último el último que se haya añadido
 	@Test
 	public void PR13() {
-		assertTrue("PR13 sin hacer", false);
+		driver.get(URL);
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Estoesunaprueba");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Prueba");
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("prueba@email.com");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("123456");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("123456");
+		driver.findElement(By.id("aceptar")).click();
+
+		driver.get(URL+"/identificarse");
+
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("admin@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.id("aceptar")).click();
+		
+		testUtil.searchText("prueba@email.com", true);
+		driver.findElements(By.id("prueba@email.com")).get(0).click();
+		driver.findElement(By.id("btEliminar")).click();
+		testUtil.waitChangeWeb();
+
+		testUtil.searchText("Usuarios", true);
+		testUtil.searchText("admin@email.com", false);
+		testUtil.searchText("prueba@email.com", false);
 	}
 
-	// PR14. Sin hacer /
+	// PR14. Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la lista se actualiza y dichos
+	// usuarios desaparecen.
 	@Test
 	public void PR14() {
-		assertTrue("PR14 sin hacer", false);
+		driver.get("https://localhost:8081/");
+		testUtil.waitChangeWeb();
+		//primero registramos los 3 usuarios que borraremos
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Estoesunaprueba1");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Prueba1");
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("prueba1@email.com");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("123456");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("123456");
+		driver.findElement(By.id("aceptar")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Cerrar sesión")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Estoesunaprueba2");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Prueba2");
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("prueba2@email.com");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("123456");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("123456");
+		driver.findElement(By.id("aceptar")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Cerrar sesión")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.linkText("Registrate")).click();
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Estoesunaprueba3");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Prueba3");
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("prueba3@email.com");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("123456");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("123456");
+		driver.findElement(By.id("aceptar")).click();
+		testUtil.waitChangeWeb();
+		driver.get(URL+"/identificarse");
+
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("admin@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.id("aceptar")).click();
+		
+		driver.get(URL+"/usuario/list");
+		testUtil.searchText("prueba1@email.com", true);
+		testUtil.searchText("prueba2@email.com", true);
+		testUtil.searchText("prueba3@email.com", true);
+		driver.findElements(By.id("prueba1@email.com")).get(0).click();
+		driver.findElements(By.id("prueba2@email.com")).get(0).click();
+		driver.findElements(By.id("prueba3@email.com")).get(0).click();
+		driver.findElement(By.id("btEliminar")).click();
+		testUtil.waitChangeWeb();
+
+		testUtil.searchText("Usuarios", true);
+		testUtil.searchText("admin@email.com", false);
+		testUtil.searchText("prueba1@email.com", false);
+		testUtil.searchText("prueba2@email.com", false);
+		testUtil.searchText("prueba3@email.com", false);
 	}
 
-	// PR15. Sin hacer /
+	// PR15. Ir al formulario de alta de oferta, rellenarla con datos válidos y pulsar el botón Submit.
+	// Comprobar que la oferta sale en el listado de ofertas de dicho usuario.
 	@Test
 	public void PR15() {
-		assertTrue("PR15 sin hacer", false);
+		driver.get(URL + "/identificarse");
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL+"/oferta/agregar");
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("Mi primera oferta");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("Sudadera gris oscura de Nike");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("25");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL + "/oferta/misofertas");
+		testUtil.searchText("Mi primera oferta", true);
+		testUtil.searchText("25", true);
 	}
 
-	// PR16. Sin hacer /
+	// PR16. Ir al formulario de alta de oferta, rellenarla con datos inválidos (campo título vacío y
+	// precio en negativo) y pulsar el botón Submit. Comprobar que se muestra el mensaje de campo
+	// obligatorio.
 	@Test
 	public void PR16() {
-		assertTrue("PR16 sin hacer", false);
+		driver.get(URL + "/identificarse");
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL+"/oferta/agregar");
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("Mi primera oferta");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("Sudadera gris oscura de Nike");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("-25"); //no se puede añadir un precio negativo
+		driver.findElement(By.className("btn-primary")).click();
+		testUtil.searchText("Compruebe el precio de su producto", true);
 	}
 
-	// PR017. Sin hacer /
+	// PR017. Mostrar el listado de ofertas para dicho usuario y comprobar que se muestran todas las
+	// que existen para este usuario.
 	@Test
 	public void PR17() {
-		assertTrue("PR17 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+	
+		driver.get(URL+"/oferta/misofertas");
+		testUtil.searchText("Mi primera oferta", true); //oferta que añadimos antes en la prueba 15.
 	}
 
-	// PR18. Sin hacer /
+	// PR18. Ir a la lista de ofertas, borrar la primera oferta de la lista, comprobar que la lista se
+	// actualiza y que la oferta desaparece.
 	@Test
 	public void PR18() {
 		assertTrue("PR18 sin hacer", false);
 	}
 
-	// PR19. Sin hacer /
+	// PR19. Ir a la lista de ofertas, borrar la última oferta de la lista, comprobar que la lista se actualiza
+	// y que la oferta desaparece.
 	@Test
 	public void PR19() {
 		assertTrue("PR19 sin hacer", false);
 	}
 
-	// P20. Sin hacer /
+	// P20. Hacer una búsqueda con el campo vacío y comprobar que se muestra la página que
+	// corresponde con el listado de las ofertas existentes en el sistema
 	@Test
 	public void PR20() {
-		assertTrue("PR20 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user3@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user3");
+
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL+"/oferta/agregar");
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("Prueba");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("Uno");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("1");
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL+"/oferta/agregar");
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("prueb");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("Uno");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("1");
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL + "/identificarse");
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL + "/oferta/buscar");
+
+		driver.findElement(By.name("busqueda")).click();
+		driver.findElement(By.name("busqueda")).clear();
+		driver.findElement(By.className("btn")).click();
+
+		driver.findElement(By.id("lastpage")).click();
+		testUtil.waitChangeWeb();
+
+		testUtil.searchText("Prueba", true);
+		testUtil.searchText("prueb", true);
 	}
 
-	// PR21. Sin hacer /
+	// PR21. Hacer una búsqueda escribiendo en el campo un texto que no exista y comprobar que se
+	// muestra la página que corresponde, con la lista de ofertas vacía.
 	@Test
 	public void PR21() {
-		assertTrue("PR21 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL+"/oferta/buscar");
+
+		driver.findElement(By.name("busqueda")).click();
+		driver.findElement(By.name("busqueda")).clear();
+		driver.findElement(By.name("busqueda")).sendKeys("olajfeffekek");
+		driver.findElement(By.className("btn")).click();
+
+		testUtil.searchText("prueb", false);
 	}
 
-	// PR22. Sin hacer /
+	// PR22. Hacer una búsqueda escribiendo en el campo un texto en minúscula o mayúscula y
+	//	comprobar que se muestra la página que corresponde, con la lista de ofertas que contengan
+	//	dicho texto, independientemente que el título esté almacenado en minúsculas o mayúscula
 	@Test
 	public void PR22() {
-		assertTrue("PR22 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user2@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user2");
+
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL+"/oferta/agregar");
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("Prueba");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("Uno");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("1");
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL+"/oferta/agregar");
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("prueb");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("Uno");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("1");
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL + "/identificarse");
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click();
+
+		driver.get(URL + "/oferta/buscar");
+
+		driver.findElement(By.name("busqueda")).click();
+		driver.findElement(By.name("busqueda")).clear();
+		driver.findElement(By.name("busqueda")).sendKeys("PRUE");
+		driver.findElement(By.className("btn")).click();
+
+		testUtil.waitChangeWeb();
+
+		testUtil.searchText("Prueba", true);
+		testUtil.searchText("prueb", true);
 	}
 
-	// PR23. Sin hacer /
+	// PR23. Sobre una búsqueda determinada (a elección de desarrollador), comprar una oferta que
+	//	deja un saldo positivo en el contador del comprobador. Y comprobar que el contador se
+	//	actualiza correctamente en la vista del comprador.
 	@Test
 	public void PR23() {
-		assertTrue("PR23 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user2@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user2");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL+"/oferta/agregar");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("miofertausuario2");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("unoo");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("1");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL+"/identificarse");
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user6@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user6");
+		driver.findElement(By.className("btn-primary")).click(); 
+		driver.get(URL+"/oferta/buscar?busqueda=miofertausuario2");
+		driver.findElements(By.className("compra")).get(0).click();
+		testUtil.waitChangeWeb();
+		driver.get(URL+"/oferta/miscompras");
+		testUtil.waitChangeWeb();
+		testUtil.searchText("miofertausuario2", true);
 	}
 
-	// PR24. Sin hacer /
+	// PR24. Sobre una búsqueda determinada (a elección de desarrollador), comprar una oferta que
+	//	deja un saldo 0 en el contador del comprobador. Y comprobar que el contador se actualiza
+	//	correctamente en la vista del comprador.
 	@Test
 	public void PR24() {
-		assertTrue("PR24 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user2@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user2");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL+"/oferta/agregar");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("miofertausuario2prueba24");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("24");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("100");
+		driver.findElement(By.className("btn-primary")).click();
+		
+		//registramos un nuevo usuario que será el que compre la oferta
+		driver.get(URL+"/registrarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Estoesunaprueba");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Prueba");
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("prueba@email.com");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("123456");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("123456");
+		driver.findElement(By.id("aceptar")).click();
+	
+		driver.get(URL+"/oferta/buscar?busqueda=miofertausuario2prueba24");
+		driver.findElements(By.className("compra")).get(0).click();
+		testUtil.waitChangeWeb();
+		driver.get(URL+"/oferta/miscompras");
+		testUtil.waitChangeWeb();
+		testUtil.searchText("miofertausuario2prueba24", true);
+	//	testUtil.searchText("0", true);
 	}
 
-	// PR25. Sin hacer /
+	// PR25. Sobre una búsqueda determinada (a elección de desarrollador), intentar comprar una
+	//	oferta que esté por encima de saldo disponible del comprador. Y comprobar que se muestra el
+	//	mensaje de saldo no suficiente.
 	@Test
 	public void PR25() {
-		assertTrue("PR25 sin hacer", false);
+		driver.get(URL+"/identificarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("email")).click();
+		driver.findElement(By.name("email")).clear();
+		driver.findElement(By.name("email")).sendKeys("user2@email.com");
+		driver.findElement(By.name("password")).click();
+		driver.findElement(By.name("password")).clear();
+		driver.findElement(By.name("password")).sendKeys("user2");
+		driver.findElement(By.className("btn-primary")).click();
+		driver.get(URL+"/oferta/agregar");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.name("nombre")).click();
+		driver.findElement(By.name("nombre")).clear();
+		driver.findElement(By.name("nombre")).sendKeys("miofertausuario2prueba25");
+		driver.findElement(By.name("info")).click();
+		driver.findElement(By.name("info")).clear();
+		driver.findElement(By.name("info")).sendKeys("24");
+		driver.findElement(By.name("precio")).click();
+		driver.findElement(By.name("precio")).clear();
+		driver.findElement(By.name("precio")).sendKeys("110");
+		driver.findElement(By.className("btn-primary")).click();
+		
+		//registramos un nuevo usuario que será el que compre la oferta
+		driver.get(URL+"/registrarse");
+		testUtil.waitChangeWeb();
+		driver.findElement(By.id("nombre")).click();
+		driver.findElement(By.id("nombre")).clear();
+		driver.findElement(By.id("nombre")).sendKeys("Estoesunaprueba");
+		driver.findElement(By.id("apellidos")).click();
+		driver.findElement(By.id("apellidos")).clear();
+		driver.findElement(By.id("apellidos")).sendKeys("Prueba");
+		driver.findElement(By.id("email")).click();
+		driver.findElement(By.id("email")).clear();
+		driver.findElement(By.id("email")).sendKeys("prueba2@email.com");
+		driver.findElement(By.id("password")).click();
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys("123456");
+		driver.findElement(By.id("rpassword")).click();
+		driver.findElement(By.id("rpassword")).clear();
+		driver.findElement(By.id("rpassword")).sendKeys("123456");
+		driver.findElement(By.id("aceptar")).click();
+		
+		
+		driver.get(URL+"/oferta/buscar?busqueda=miofertausuario2prueba25");
+		driver.findElements(By.className("compra")).get(0).click();
+		testUtil.searchText("Sin saldo suficiente", true);
 	}
 
-	// PR26. Sin hacer /
+	// PR26. Ir a la opción de ofertas compradas del usuario y mostrar la lista. Comprobar que
+	// aparecen las ofertas que deben aparecer.
 	@Test
 	public void PR26() {
 		assertTrue("PR26 sin hacer", false);
-	}
-
-	// PR27. Sin hacer /
-	@Test
-	public void PR27() {
-		assertTrue("PR27 sin hacer", false);
-	}
-
-	// PR029. Sin hacer /
-	@Test
-	public void PR29() {
-		assertTrue("PR29 sin hacer", false);
 	}
 
 	// PR030. Sin hacer /
@@ -293,5 +872,8 @@ public class SdiEntrega2Tests {
 	public void PR31() {
 		assertTrue("PR31 sin hacer", false);
 	}
+	
+	// PR33. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que
+	// existen, menos las del usuario identificado.
 
 }

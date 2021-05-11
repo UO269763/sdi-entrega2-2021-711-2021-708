@@ -65,8 +65,8 @@ module.exports = function (app, gestorBD) {
     });
 
 
-     // ENVIAR MENSAJE A UNA OFERTA
-     app.post('/api/oferta/mensaje/:id', function (req, res) {
+    // ENVIAR MENSAJE A UNA OFERTA
+    app.post('/api/oferta/mensaje/:id', function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
                 if (err) {
@@ -90,10 +90,12 @@ module.exports = function (app, gestorBD) {
                                 $or: [
                                     {
                                         user1: usuario,
+                                        user2: oferta.autor,
                                         offer: oferta._id
                                     },
                                     {
                                         user1: oferta.autor,
+                                        user2: usuario,
                                         offer: oferta._id
                                     }
                                 ]
@@ -187,7 +189,7 @@ module.exports = function (app, gestorBD) {
                 };
                 gestorBD.obtenerMensajes(criterio, function (mensajes) {
                     if (mensajes == null) {
-                        res.status(500);
+                        res.status(200);
                         app.get("logger").info('API: Error al obtener el mensaje');
                         res.json({
                             error: "Ha habido un error"
@@ -200,8 +202,33 @@ module.exports = function (app, gestorBD) {
                 });
             }
         });
-
     });
+
+    app.post("/api/oferta/conversacion/reload/:id", function (req, res) {
+        let crit = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.obtenerConversaciones(crit, function (conversaciones) {
+            if (conversaciones == null) {
+                res.status(500);
+                app.get("logger").info('API: Error al obtener la conversacion');
+                res.json({error: "Se ha producido un error"});
+            } else if (conversaciones.length === 0) {
+                res.status(200);
+                res.json([]);
+            } else {
+                let conversacion = conversaciones[0];
+                let criterio = {
+                    idConversacion: gestorBD.mongo.ObjectID(conversacion._id),
+                    read: true
+                };
+                gestorBD.obtenerMensajes(criterio, function (mensajes) {
+                    res.status(200);
+                    app.get("logger").info('API: Mensaje obtenido correctamente');
+                    res.json(mensajes);
+
+                });
+            }
+        });
+    })
 
     app.post("/api/mensaje/eliminar/", function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
@@ -286,19 +313,32 @@ module.exports = function (app, gestorBD) {
     });
 
     app.post("/api/oferta/conversacion/list", function (req, res) {
-        let criterio = {$or: [{user1: res.usuario}, {user2: res.usuario}]};
-        gestorBD.obtenerConversaciones(criterio, function (conver) {
-            if (conver == null) {
-                res.status(500)
-                app.get("logger").info('API: Error mostrando las conversaciones');
+        let token = req.headers['token'] || req.body.token || req.query.token;
+        app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
+            if (err) {
+                res.status(403); // Forbidden
+                app.get("logger").info('API: Token no valido');
                 res.json({
-                    error: "Se ha producido un error"
-                })
+                    acceso: false,
+                    error: 'Token invalido o caducado'
+                });
             } else {
-                app.get("logger").info('API: Se han listado las conversaciones');
-                res.send(conver);
+                let criterio = {$or: [{user1: infoToken.usuario}, {user2: infoToken.usuario}]};
+                gestorBD.obtenerConversaciones(criterio, function (conver) {
+                    if (conver == null) {
+                        res.status(500)
+                        app.get("logger").info('API: Error mostrando las conversaciones');
+                        res.json({
+                            error: "Se ha producido un error"
+                        })
+                    } else {
+                        app.get("logger").info('API: Se han listado las conversaciones');
+                        res.send(conver);
 
+                    }
+                });
             }
+
         });
     });
 
@@ -425,4 +465,5 @@ module.exports = function (app, gestorBD) {
             }
         })
     });
+
 }

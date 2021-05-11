@@ -1,3 +1,4 @@
+
 <div class="bodyWrapper">
     <div class="currentChat">
         <div class="currentChatHeader">
@@ -11,14 +12,14 @@
         <div class="currentChatContent" id="currentChatContent">
             <div class="message received">
                 <div class="messageContent">
-                    Cargando...
+                    Cargando los mensajes del chat...
                 </div>
                 <div class="messageTime">12:32</div>
                 <div class="messageTime">✈</div>
             </div>
             <div class="message sent">
                 <div class="messageContent">
-                    ...Espere un momento
+                    Hola??
                 </div>
                 <div class="messageTime">12:50</div>
                 <div class="messageTime">✈</div>
@@ -30,7 +31,10 @@
         </div>
     </div>
 </div>
+
 <script>
+
+
 
     function cargarConversaciones() {
         $("#chatTitle").empty()
@@ -50,6 +54,30 @@
             error: function () {
                 $("#contenedor-principal").load("widget-conversaciones.html");
 
+            }
+        });
+    }
+
+    function recargarConver(){
+        $.ajax({
+            url: URLbase + "/oferta/conversacion/reload/"+idOferta,
+            type: "POST",
+            data: {},
+            headers: {
+                "token": token
+            },
+            success: function (res) {
+                mensajes = res;
+                console.log(mensajes);
+                if (mensajes === null || mensajes.length===0) { //no hay q recargar el chat
+
+                } else {
+                    console.log("recargando conversacion");
+                    cargarConversaciones();
+                }
+            },
+            error: function (error) {
+                $("#contenedor-principal").load("widget-conversaciones.html");
             }
         });
     }
@@ -76,8 +104,8 @@
         $("#currentChatContent").empty();
         for (var i = 0; i < messages.length; i++) {
             var message = "";
-            console.log("RECEPTOR DEL MENSAJE" + messages[i].receiver)
-            console.log("ACTUAL USUARIO EN SESION" + Cookies.get('semail'))
+           // console.log("RECEPTOR DEL MENSAJE" + messages[i].receiver)
+           // console.log("ACTUAL USUARIO EN SESION" + Cookies.get('semail'))
             if (messages[i].receiver === Cookies.get('semail')) {
                 message = "<div class='currentChatContent'>" +
                     "<div class='message sent'>"  +
@@ -147,5 +175,7 @@
     }
 
     cargarConversaciones();
+
+    setInterval(function(){recargarConver()},5000)
 
 </script>

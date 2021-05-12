@@ -136,7 +136,6 @@ module.exports = function (app, swig, gestorBD) {
     //metodo del admin que permite borrar usuarios
     app.post("/usuario/borrar", function (req,res){
         let idsUsuarios = req.body.checkbox;
-        console.log(idsUsuarios);
         if (idsUsuarios === undefined){
             res.redirect("/usuario/list?mensaje=Los usuarios no se pudieron eliminar");
         } else {

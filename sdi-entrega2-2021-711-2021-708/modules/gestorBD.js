@@ -320,7 +320,6 @@ module.exports = {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('mensajes');
-                console.log(crit)
                 collection.find(crit).toArray(function (err, mensajes) {
                     if (err) {
                         funcionCallback(null);

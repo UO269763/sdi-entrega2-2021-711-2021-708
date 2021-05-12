@@ -1,5 +1,6 @@
 module.exports = function (app, swig, gestorBD) {
 
+    // Nos redirige a la vista para registrar un usuario
     app.get("/registrarse", function (req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', { usuarioSesion: req.session.usuario});
         res.send(respuesta);
@@ -62,11 +63,13 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
+    // Nos redirige a la vista para iniciar sesion un usuario
     app.get("/identificarse", function (req, res) {
         let respuesta = swig.renderFile('views/bidentificacion.html', { usuarioSesion: req.session.usuario });
         res.send(respuesta);
     });
 
+    // Comprueba que los datos introducidos coincidan con un usario, sino lanzo error
     app.post("/identificarse", function (req, res) {
         if (req.body.email === "" || req.body.email == null) {
             res.redirect("/registrarse?mensaje=El email no puede estar vacío");
@@ -100,6 +103,7 @@ module.exports = function (app, swig, gestorBD) {
         });
     });
 
+    // Nos desconecta de la sesion
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         let respuesta = swig.renderFile('views/bidentificacion.html', {usuarioSesion: null});
@@ -129,6 +133,7 @@ module.exports = function (app, swig, gestorBD) {
 
     })
 
+    //metodo del admin que permite borrar usuarios
     app.post("/usuario/borrar", function (req,res){
         let idsUsuarios = req.body.checkbox;
         console.log(idsUsuarios);

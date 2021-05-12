@@ -203,6 +203,7 @@ module.exports = function (app, gestorBD) {
 
     });
 
+    // elimina un mensaje d una oferta
     app.post("/api/mensaje/eliminar/", function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
@@ -266,6 +267,7 @@ module.exports = function (app, gestorBD) {
 
     });
 
+    // Marcamos como leido un mensaje d una oferta
     app.get("/api/mensaje/leido/:id", function (req, res) {
         let criterio = {
             "_id": gestorBD.mongo.ObjectID(req.params.id)
@@ -285,6 +287,7 @@ module.exports = function (app, gestorBD) {
         })
     });
 
+    // Mostramos las conversaciones que tienen nuestras ofertas
     app.post("/api/oferta/conversacion/list", function (req, res) {
         let criterio = {$or: [{user1: res.usuario}, {user2: res.usuario}]};
         gestorBD.obtenerConversaciones(criterio, function (conver) {
@@ -302,7 +305,7 @@ module.exports = function (app, gestorBD) {
         });
     });
 
-
+    // Eliminamos una conversacion, por lo que eliminamos tambien sus mensajes
     app.get("/api/conversacion/borrar/:id", function (req, res) {
         let idOferta = gestorBD.mongo.ObjectID(req.params.id);
         let criterio = {idConversacion: idOferta};
@@ -349,7 +352,7 @@ module.exports = function (app, gestorBD) {
         });
 
     });
-
+    // Obtenemos una conversacion especifica, con sus mensajes y sus usuarios
     app.post('/api/buscar/oferta/conversacion/:id', function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {

@@ -1,5 +1,6 @@
 module.exports = function (app, swig, gestorBD) {
 
+    // Vamos a la vista de administrador
     app.get("/admin", function (req, res) {
         let respuesta = swig.renderFile('views/badmin.html', {
             usuarioSesion: req.session.usuario
@@ -7,6 +8,7 @@ module.exports = function (app, swig, gestorBD) {
         res.send(respuesta);
     });
 
+    // Si es administrador tiene acceso a reiniciar la base
     app.get("/resetdb", function (req, res) {
         let usuarioSesion = req.session.usuario;
         if ( usuarioSesion === null || usuarioSesion.rol === 'user'){
@@ -23,6 +25,7 @@ module.exports = function (app, swig, gestorBD) {
 
     });
 
+    // Añadimos el administrador
     function addAdmin(res) {
         let seguro = app.get("crypto").createHmac('sha256',
             app.get('clave')).update('admin').digest('hex');
@@ -50,6 +53,7 @@ module.exports = function (app, swig, gestorBD) {
         })
     }
 
+    // Inicializamos la base para facilitar su uso
     function createData(res) {
         const listaUsuarios = [];
         const max = 10;

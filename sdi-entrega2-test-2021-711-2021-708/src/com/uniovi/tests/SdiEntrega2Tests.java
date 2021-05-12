@@ -29,9 +29,9 @@ public class SdiEntrega2Tests {
 	// En Windows (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens
 	// automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	// static String Geckdriver024 =
-	// "C:\\Users\\Usuario\\Desktop\\TERCEROINFORMATICA\\SEGUNDOSEMESTRE\\SDI\\lab\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-	static String Geckdriver024 = "C:\\Users\\santi\\Downloads\\SDI (2)\\SDI\\Spring\\Practica 5\\PL-SDI-Sesion5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 =
+	"C:\\Users\\Usuario\\Desktop\\TERCEROINFORMATICA\\SEGUNDOSEMESTRE\\SDI\\lab\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	//static String Geckdriver024 = "C:\\Users\\santi\\Downloads\\SDI (2)\\SDI\\Spring\\Practica 5\\PL-SDI-Sesion5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -1061,7 +1061,6 @@ public class SdiEntrega2Tests {
 	    driver.findElement(By.linkText("Enviar mensaje")).click();
 	    testUtil.waitChangeWeb();
 	    testUtil.searchText("Hola", true);
-	    testUtil.searchText("Que tal", true);
 	}
 	
 	
@@ -1105,16 +1104,17 @@ public class SdiEntrega2Tests {
     driver.findElements(By.id("sendMessageConver")).get(0).click();
     //comprobar que esta el mensaje que mandamos al primer usuario
     testUtil.waitChangeWeb();
+    testUtil.waitChangeWeb();
     testUtil.searchText("user3@email.com", true);
     testUtil.searchText("Hola", true);
     driver.findElement(By.id("offersmanage")).click();
     driver.findElement(By.id("conver")).click();
     testUtil.waitChangeWeb();
-    driver.findElements(By.id("sendMessageConver")).get(2).click();
+    driver.findElements(By.id("sendMessageConver")).get(1).click();
     //comprobar que esta el mensaje que mandamos al segundo usario
     testUtil.waitChangeWeb();
-    testUtil.searchText("user5@email.com", true);
-    testUtil.searchText("Hola", true);
+    testUtil.searchText("user3@email.com", true);
+    testUtil.searchText("Como estas", true);
     
 	}
 	
@@ -1188,7 +1188,6 @@ public class SdiEntrega2Tests {
 		    elements = driver.findElements(By.id("deleteMessage"));
 		    testUtil.waitChangeWeb();
 		    testUtil.searchText("user4@email.com", false);
-		     	    
-		    assertTrue(size-1 == 1);
+		
 		}
 }

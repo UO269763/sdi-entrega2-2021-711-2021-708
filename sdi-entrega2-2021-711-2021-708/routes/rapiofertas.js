@@ -65,8 +65,8 @@ module.exports = function (app, gestorBD) {
     });
 
 
-     // ENVIAR MENSAJE A UNA OFERTA
-     app.post('/api/oferta/mensaje/:id', function (req, res) {
+    // ENVIAR MENSAJE A UNA OFERTA
+    app.post('/api/oferta/mensaje/:id', function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
         app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
                 if (err) {
@@ -94,6 +94,14 @@ module.exports = function (app, gestorBD) {
                                     },
                                     {
                                         user1: oferta.autor,
+                                        offer: oferta._id
+                                    },
+                                    {
+                                        user2: usuario,
+                                        offer: oferta._id
+                                    },
+                                    {
+                                        user2: oferta.autor,
                                         offer: oferta._id
                                     }
                                 ]
@@ -125,7 +133,6 @@ module.exports = function (app, gestorBD) {
                                             }
                                         });
                                     } else {
-                                        //si el receptor es nulo consideramos que el propietario esta enviando el mensaje
                                         enviarMensaje(
                                             req.body.message,
                                             usuario,
@@ -187,7 +194,7 @@ module.exports = function (app, gestorBD) {
                 };
                 gestorBD.obtenerMensajes(criterio, function (mensajes) {
                     if (mensajes == null) {
-                        res.status(500);
+                        res.status(200);
                         app.get("logger").info('API: Error al obtener el mensaje');
                         res.json({
                             error: "Ha habido un error"
@@ -200,8 +207,8 @@ module.exports = function (app, gestorBD) {
                 });
             }
         });
-
     });
+
 
     // elimina un mensaje d una oferta
     app.post("/api/mensaje/eliminar/", function (req, res) {
@@ -289,19 +296,32 @@ module.exports = function (app, gestorBD) {
 
     // Mostramos las conversaciones que tienen nuestras ofertas
     app.post("/api/oferta/conversacion/list", function (req, res) {
-        let criterio = {$or: [{user1: res.usuario}, {user2: res.usuario}]};
-        gestorBD.obtenerConversaciones(criterio, function (conver) {
-            if (conver == null) {
-                res.status(500)
-                app.get("logger").info('API: Error mostrando las conversaciones');
+        let token = req.headers['token'] || req.body.token || req.query.token;
+        app.get('jwt').verify(token, 'secreto', function (err, infoToken) {
+            if (err) {
+                res.status(403); // Forbidden
+                app.get("logger").info('API: Token no valido');
                 res.json({
-                    error: "Se ha producido un error"
-                })
+                    acceso: false,
+                    error: 'Token invalido o caducado'
+                });
             } else {
-                app.get("logger").info('API: Se han listado las conversaciones');
-                res.send(conver);
+                let criterio = {$or: [{user1: infoToken.usuario}, {user2: infoToken.usuario}]};
+                gestorBD.obtenerConversaciones(criterio, function (conver) {
+                    if (conver == null) {
+                        res.status(500)
+                        app.get("logger").info('API: Error mostrando las conversaciones');
+                        res.json({
+                            error: "Se ha producido un error"
+                        })
+                    } else {
+                        app.get("logger").info('API: Se han listado las conversaciones');
+                        res.send(conver);
 
+                    }
+                });
             }
+
         });
     });
 
@@ -428,4 +448,5 @@ module.exports = function (app, gestorBD) {
             }
         })
     });
+
 }

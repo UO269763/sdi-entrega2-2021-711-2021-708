@@ -1,3 +1,4 @@
+
 <div class="bodyWrapper">
     <div class="currentChat">
         <div class="currentChatHeader">
@@ -11,16 +12,16 @@
         <div class="currentChatContent" id="currentChatContent">
             <div class="message received">
                 <div class="messageContent">
-                    Cargando...
+                    Cargando los mensajes del chat...
                 </div>
-                <div class="messageTime">12:32</div>
+                <div class="messageTime">12:30:09</div>
                 <div class="messageTime">✈</div>
             </div>
-            <div class="message sent">
+            <div class="message sent" style="text-align: center">
                 <div class="messageContent">
-                    ...Espere un momento
+                    Hola??
                 </div>
-                <div class="messageTime">12:50</div>
+                <div class="messageTime">12:50:01</div>
                 <div class="messageTime">✈</div>
             </div>
         </div>
@@ -30,7 +31,10 @@
         </div>
     </div>
 </div>
+
 <script>
+
+
 
     function cargarConversaciones() {
         $("#chatTitle").empty()
@@ -54,6 +58,7 @@
         });
     }
 
+
     function mostrarConver(conversacionid ) {
         let token = Cookies.get('token');
         $.ajax({
@@ -76,10 +81,9 @@
         $("#currentChatContent").empty();
         for (var i = 0; i < messages.length; i++) {
             var message = "";
-
             if (messages[i].receiver === Cookies.get('semail')) {
                 message = "<div class='currentChatContent'>" +
-                    "<div class='message sent'>"  +
+                    "<div class='message sent' style='text-align: center'>"  +
                     "<div class='messageContent'>" + messages[i].message + "</div>" +
                     "<div class='messageTime'>" + messages[i].fecha + "</div>";
                 if (messages[i].read) {
@@ -96,7 +100,7 @@
                 message = "<div class='currentChatContent'>" +
                     "<div class='message received'>"+
                     "<div class='messageContent'>" + messages[i].message + "</div>" +
-                    "<div class='messageTime'>" +  messages[i].fecha  + "</div>" ;
+                    "<div class='messageTime'>" +  messages[i].fecha  + "</div>";
 
                 message += "</div>" ;
 
@@ -145,8 +149,8 @@
         });
     }
 
-    setInterval(function() {
-        cargarConversaciones();
-    }, 5000);
+
+    setInterval(function(){cargarConversaciones()},5000)
+
 
 </script>

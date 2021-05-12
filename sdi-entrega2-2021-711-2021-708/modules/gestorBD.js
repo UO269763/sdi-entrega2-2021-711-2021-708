@@ -40,22 +40,6 @@ module.exports = {
                 });
             }
         });
-    },obtenerTodosUsuarios : function(funcionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('usuarios');
-                collection.find().toArray(function(err, usuarios) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(usuarios);
-                    }
-                    db.close();
-                });
-            }
-        });
     },
     // Borrar un usuario de la base
     borrarUsuario: function(criterio,funcionCallback){
@@ -136,40 +120,6 @@ module.exports = {
         });
 
     },
-    obtenerCompras : function(criterio,funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('compras');
-                collection.find(criterio).toArray(function (err, usuarios) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(usuarios);
-                    }
-                    db.close();
-                });
-            }
-        });
-    },
-    insertarCompra: function(compra, funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('compras');
-                collection.insert(compra, function(err, result) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(result.ops[0]._id);
-                    }
-                    db.close();
-                });
-            }
-        });
-    },
     // Eliminamos una oferta de la base
     eliminarOferta : function(criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
@@ -182,57 +132,6 @@ module.exports = {
                         funcionCallback(null);
                     } else {
                         funcionCallback(result);
-                    }
-                    db.close();
-                });
-            }
-        });
-    },
-    borrarComentario: function(criterio,funcionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'),function (err,db){
-            if(err){
-                funcionCallback(null);
-            }else{
-                let collection=db.collection('comentarios');
-                collection.deleteOne(criterio,function (err,deleted){
-                    if(err){
-                        funcionCallback(null);
-                    }
-                    else{
-                        funcionCallback(deleted);
-                    }
-
-                    db.close();
-                });
-            }
-        });
-    }, insertarComentario : function(comentario, funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('comentarios');
-                collection.insert(comentario, function(err, result) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(result.ops[0]._id);
-                    }
-                    db.close();
-                });
-            }
-        });
-    },obtenerComentarios : function(criterio,funcionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('comentarios');
-                collection.find(criterio).toArray(function(err, comentarios) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(comentarios);
                     }
                     db.close();
                 });
@@ -271,44 +170,6 @@ module.exports = {
                         funcionCallback(result.ops[0]._id);
                     }
                     db.close();
-                });
-            }
-        });
-    },
-    borrarOfertas : function(criterio,funcionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'),function (err,db){
-            if(err){
-                funcionCallback(null);
-            }else{
-                let collection=db.collection('ofertas');
-                collection.deleteOne(criterio,function (err,deleted){
-                    if(err){
-                        funcionCallback(null);
-                    }
-                    else{
-                        funcionCallback(deleted);
-                    }
-
-                    db.close();
-                });
-            }
-        });
-    },obtenerListadoOfertasPg: function (criterio, pg, funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
-            if (err) {
-                funcionCallback(null);
-            } else {
-                let collection = db.collection('ofertas');
-                collection.count(function (err, count) {
-                    collection.find(criterio).skip((pg - 1) * 5).limit(5)
-                        .toArray(function (err, ofertas) {
-                            if (err) {
-                                funcionCallback(null);
-                            } else {
-                                funcionCallback(ofertas, count);
-                            }
-                            db.close();
-                        });
                 });
             }
         });
@@ -466,7 +327,7 @@ module.exports = {
                                         db.close();
                                     } else {
                                         let usuarios = db.collection('usuarios');
-                                        usuarios.remove(err, function (result) {
+                                        usuarios.remove(err, function () {
                                             if (err) {
                                                 funcionCallback(null);
                                             } else {

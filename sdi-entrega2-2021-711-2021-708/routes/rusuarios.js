@@ -13,22 +13,16 @@ module.exports = function (app, swig, gestorBD) {
     app.post('/registrarse', function (req, res) {
         if (req.body.nombre.length < 2) {
             res.redirect("/registrarse?mensaje=El nombre debe tener mas de 2 caracteres");
-            return;
         } else if (req.body.email === "" || req.body.email == null) {
             res.redirect("/registrarse?mensaje=El email no puede estar vacío");
-            return;
         } else if (!req.body.email.includes("@")) {
             res.redirect("/registrarse?mensaje=El email debe contener @");
-            return;
         } else if (req.body.password.length < 4) {
             res.redirect("/registrarse?mensaje=La contraseña debe tener 4 o más caracteres");
-            return;
         } else if (req.body.apellidos.length < 2) {
             res.redirect("/registrarse?mensaje=El apellido debe tener mas de 2 caracteres");
-            return;
         } else if (req.body.password !== req.body.rpassword) {
             res.redirect("/registrarse?mensaje=Las contraseñas no coinciden.");
-            return;
         } else {
             let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest('hex');

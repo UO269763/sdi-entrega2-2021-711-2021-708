@@ -64,7 +64,6 @@ module.exports = function (app, gestorBD) {
         })
     });
 
-
     // ENVIAR MENSAJE A UNA OFERTA
     app.post('/api/oferta/mensaje/:id', function (req, res) {
         let token = req.headers['token'] || req.body.token || req.query.token;
@@ -150,6 +149,9 @@ module.exports = function (app, gestorBD) {
         );
     });
 
+    /*
+    Funcion que envía un mensaje
+     */
     function enviarMensaje(text, sender, receiver, convId, offerId, req, res) {
         let message = {
             sender: sender,

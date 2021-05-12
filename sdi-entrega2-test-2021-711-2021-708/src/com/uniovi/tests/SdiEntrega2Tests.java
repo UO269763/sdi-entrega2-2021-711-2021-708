@@ -29,9 +29,9 @@ public class SdiEntrega2Tests {
 	// En Windows (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens
 	// automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 =
-	"C:\\Users\\Usuario\\Desktop\\TERCEROINFORMATICA\\SEGUNDOSEMESTRE\\SDI\\lab\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-	//static String Geckdriver024 = "C:\\Users\\santi\\Downloads\\SDI (2)\\SDI\\Spring\\Practica 5\\PL-SDI-Sesion5-material\\geckodriver024win64.exe";
+	//static String Geckdriver024 =
+	//"C:\\Users\\Usuario\\Desktop\\TERCEROINFORMATICA\\SEGUNDOSEMESTRE\\SDI\\lab\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\santi\\Downloads\\SDI (2)\\SDI\\Spring\\Practica 5\\PL-SDI-Sesion5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -1113,9 +1113,9 @@ public class SdiEntrega2Tests {
     driver.findElements(By.id("sendMessageConver")).get(1).click();
     //comprobar que esta el mensaje que mandamos al segundo usario
     testUtil.waitChangeWeb();
-    testUtil.searchText("user3@email.com", true);
-    testUtil.searchText("Como estas", true);
     
+    testUtil.searchText("Como estas", true);
+    testUtil.searchText("user4@email.com", true);
 	}
 	
 	// PR37. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar de la primera y

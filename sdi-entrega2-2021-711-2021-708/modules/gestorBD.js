@@ -5,6 +5,7 @@ module.exports = {
         this.mongo = mongo;
         this.app = app;
     },
+    // Añadimos un nuevo usuario a la base
     insertarUsuario : function(usuario, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -22,6 +23,7 @@ module.exports = {
             }
         });
     },
+    // Obtenemos los  usuarios que se encuentren en la base de datos
     obtenerUsuarios : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -55,6 +57,7 @@ module.exports = {
             }
         });
     },
+    // Borrar un usuario de la base
     borrarUsuario: function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'),function (err,db){
             if(err){
@@ -73,6 +76,7 @@ module.exports = {
             }
         });
     },
+    // Modificamos un usuario de la base
     modificarUsuario: function (criterio, usuario, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -92,6 +96,7 @@ module.exports = {
         });
 
     },
+    // Recuperamos las ofertas de la base de datos, con paginacion
     obtenerOfertasPg : function(criterio,pg,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -112,6 +117,7 @@ module.exports = {
             }
         });
     },
+    // Modificamos una oferta que se encuentre en la base
     modificarOferta: function (criterio, oferta, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -164,6 +170,7 @@ module.exports = {
             }
         });
     },
+    // Eliminamos una oferta de la base
     eliminarOferta : function(criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -232,6 +239,7 @@ module.exports = {
             }
         });
     },
+    // Recuperamos las ofertas de la base de datos
     obtenerOfertas : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -249,6 +257,7 @@ module.exports = {
             }
         });
     },
+    // Intersamos una ofertas a la base de datos
     insertarOferta : function(oferta, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -304,6 +313,7 @@ module.exports = {
             }
         });
     },
+    // Recuperamos los mensajes de la base de datos
     obtenerMensajes: function (crit, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -322,6 +332,7 @@ module.exports = {
             }
         });
     },
+    // Eliminamos un mensaje de la base de datos
     eliminarMensajes: function (criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -339,6 +350,7 @@ module.exports = {
             }
         });
     },
+    // Eliminamos conversacion de la base de datos
     eliminarConversaciones: function (criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -356,6 +368,7 @@ module.exports = {
             }
         });
     },
+    // Obtenemos las conversaciones de la base de datos
     obtenerConversaciones:function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -375,6 +388,7 @@ module.exports = {
         });
 
     },
+    // Insertamos una conversacion en la base de datos
     crearNuevaConversacion: function (mensaje, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -392,6 +406,7 @@ module.exports = {
             }
         });
     },
+    // Marcamos un mensaje como leido en la base
     marcarLeido: function (criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -409,6 +424,7 @@ module.exports = {
             db.close();
         });
     },
+    // Insertamos un mensaje a la base de datos
     insertarMensaje: function (message, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -426,6 +442,7 @@ module.exports = {
             }
         });
     },
+    // Reseteamos la base
     resetDB: function (funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {

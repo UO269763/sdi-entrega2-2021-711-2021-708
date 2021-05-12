@@ -81,8 +81,6 @@
         $("#currentChatContent").empty();
         for (var i = 0; i < messages.length; i++) {
             var message = "";
-           // console.log("RECEPTOR DEL MENSAJE" + messages[i].receiver)
-           // console.log("ACTUAL USUARIO EN SESION" + Cookies.get('semail'))
             if (messages[i].receiver === Cookies.get('semail')) {
                 message = "<div class='currentChatContent'>" +
                     "<div class='message sent' style='text-align: center'>"  +
@@ -152,7 +150,7 @@
     }
 
 
-
     setInterval(function(){cargarConversaciones()},5000)
+
 
 </script>

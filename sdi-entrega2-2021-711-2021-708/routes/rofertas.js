@@ -12,7 +12,10 @@ module.exports = function (app, swig, gestorBD) {
         res.send(respuesta);
     });
 
+
+    // Agregar una nueva oferta
     app.post("/oferta/agregar", function (req, res) {
+        //Comprobamos todos los posibles errores al agregar una oferta
         if (req.session.usuario == null) {
             res.redirect("/identificarse");
             return;
@@ -32,6 +35,7 @@ module.exports = function (app, swig, gestorBD) {
             res.redirect("/oferta/agregar?mensaje=Compruebe el precio de su producto");
             return;
         }
+        // En caso de que no haya errores procedemos a añadirla, guardando todos lo necesario
         let now = new Date();
         var oferta = {
             nombre: req.body.nombre,
@@ -42,7 +46,7 @@ module.exports = function (app, swig, gestorBD) {
             estado: 'disponible',
             comprador: undefined
         }
-        // Conectarse
+        // Conectarse a la base de datos e insertarla
         gestorBD.insertarOferta(oferta, function (id) {
             if (id == null) {
                 res.send("Error al insertar oferta");
@@ -206,6 +210,7 @@ module.exports = function (app, swig, gestorBD) {
         })
     });
 
+    // Sacamos todas las compras que haya hecho el usuario y le redirigimos a la vista de compras
     app.get("/oferta/miscompras", function (req, res) {
         let criterio = {
             estado: 'no disponible',
